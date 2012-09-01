@@ -7,6 +7,9 @@ MainWindow::MainWindow(QWidget *parent) :
     saveAction = new QAction(tr("&Save"), this);
     exitAction = new QAction(tr("E&xit"), this);
 
+    noteEdit = new NoteEditor;
+    setCentralWidget(noteEdit);
+
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
     connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
@@ -17,35 +20,36 @@ MainWindow::MainWindow(QWidget *parent) :
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
-    noteEdit = new NoteEditor;
-    setCentralWidget(noteEdit);
-
     setWindowTitle(tr("ThreeRing"));
     resize(800, 600);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if(quit()) event->accept();
+    if(quitConfirm()) event->accept();
     else event->ignore();
 }
 
+// Open a document.
 void MainWindow::open()
 {
-    //TODO: implement
-    QMessageBox::critical(this, tr("Open"),
-                          tr("Opening and saving files is not yet implemented."));
-    return;
+    QString path = QFileDialog::getOpenFileName(
+                this, tr("Open"), QDir::homePath(), tr("SVG files (*.svg)"));
+    svgOpen(path, noteEdit);
 }
 
-void MainWindow::save(){
-    //TODO: implement
-    QMessageBox::critical(this, tr("Save"),
-                          tr("Opening and saving files is not yet implemented."));
-    return;
+// Save the current document.
+void MainWindow::save()
+{
+    // TODO: default to the file opened
+    QString path = QFileDialog::getSaveFileName(
+                this, tr("Save"), QDir::homePath(), tr("SVG files (*.svg)"));
+    if (path.isEmpty()) return;
+    svgSave(path, noteEdit);
 }
 
-bool MainWindow::quit()
+// Confirm quit.
+bool MainWindow::quitConfirm()
 {
     //TODO: check for document changes and ask to save
     return (QMessageBox::question(
@@ -56,4 +60,10 @@ bool MainWindow::quit()
                 QMessageBox::No
                 ) == QMessageBox::Yes
             );
+}
+
+void MainWindow::notImplemented()
+{
+    QMessageBox::critical(this, tr("Error"),
+                          tr("This feature is not yet implemented."));
 }

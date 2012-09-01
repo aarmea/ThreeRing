@@ -2,15 +2,16 @@
 
 // Default constructor.
 Curve::Curve(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    pen(QBrush(Qt::black), 1.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)
 {
 }
 
 // Copy constructor.
-Curve::Curve(const Curve &otherCurve)
+Curve::Curve(const Curve &otherCurve) :
+    pen(otherCurve.pen),
+    points(otherCurve.points)
 {
-    pen = otherCurve.pen;
-    points = otherCurve.points;
 }
 
 // Adds a point to the end of a curve.

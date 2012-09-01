@@ -7,6 +7,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include "noteeditor.h"
+#include "svgfileio.h"
 
 class MainWindow : public QMainWindow
 {
@@ -18,6 +19,8 @@ public:
 signals:
     
 public slots:
+    void open();
+    void save();
     
 private:
     NoteEditor *noteEdit;
@@ -27,10 +30,10 @@ private:
     QAction *saveAction;
     QAction *exitAction;
 
+    bool quitConfirm();
+
 private slots:
-    void open();
-    void save();
-    bool quit();
+    void notImplemented();
 };
 
 #endif // MAINWINDOW_H
