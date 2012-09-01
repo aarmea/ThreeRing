@@ -1,29 +1,23 @@
 #ifndef CURVE_H
 #define CURVE_H
 
-#include <QObject>
-#include <QVector>
-#include <QPointF>
+#include <QPolygonF>
 #include <QPen>
 
-typedef QVector<QPointF> curve_type;
-typedef curve_type::size_type curve_size_type;
-typedef QVector<QPoint> curve_raster_type;
-
-class Curve : public QObject
+// TODO: implement getters and setters for selected
+// select(), deselect(), isSelected()
+class Curve : public QPolygonF
 {
-    Q_OBJECT
 public:
-    explicit Curve(QObject *parent = 0);
+    explicit Curve();
     Curve(const Curve &otherCurve);
 
-    void addPoint(const QPointF &point);
-    void clear();
-    QPointF getPoint(curve_size_type n);
-    QPointF* getPoints();
-    curve_raster_type getRasterPoints(curve_size_type n);
-    curve_size_type size() const;
+    void select();
+    void deselect();
+    bool isSelected();
 
+    typedef QVector<QPoint> raster_type;
+    raster_type getRasterPoints(size_type n);
     const QPen& getPen() const;
     void setPen(const QPen &newPen);
     
@@ -32,8 +26,8 @@ signals:
 public slots:
 
 private:
+    bool selected;
     QPen pen;
-    curve_type points;
     
 };
 

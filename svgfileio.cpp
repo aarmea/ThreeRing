@@ -45,9 +45,15 @@ void svgParseGroup(const QDomElement &element, NoteEditor *editor, QPen pen)
 
     // Convert the <g> tag into a QPen
     if (element.hasAttribute("stroke-width"))
-        pen.setWidth(element.attribute("stroke-width").toInt());
-    if (element.hasAttribute("stroke"))
-        pen.setColor(QColor(element.attribute("stroke").toInt()));
+        pen.setWidthF(element.attribute("stroke-width").toDouble());
+    if (element.hasAttribute("stroke")) {
+        // Colors by hex value with '#' prefix
+        if (element.attribute("stroke").at(0) == '#') {
+            pen.setColor(QColor(element.attribute("stroke")
+                                .right(6).toInt(0, 16)));
+        }
+        // TODO: handle colors by name
+    }
 
     if (element.hasAttribute("stroke-linecap")) {
         QString linecap = element.attribute("stroke-linecap");

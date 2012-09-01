@@ -1,56 +1,54 @@
 #include "curve.h"
 
 // Default constructor.
-Curve::Curve(QObject *parent) :
-    QObject(parent),
-    pen(QBrush(Qt::black), 1.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)
+Curve::Curve() :
+    pen(QBrush(Qt::black), 1.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin),
+    selected(false)
 {
 }
 
 // Copy constructor.
 Curve::Curve(const Curve &otherCurve) :
-    pen(otherCurve.pen),
-    points(otherCurve.points)
+    pen(otherCurve.pen), selected(otherCurve.selected)
 {
 }
 
-// Adds a point to the end of a curve.
-void Curve::addPoint(const QPointF &point)
-{
-    points.push_back(point);
+// Manage whether the curve is selected
+void Curve::select() {
+    selected = true;
 }
 
-// Removes all points from a curve.
-void Curve::clear()
-{
-    points.clear();
+void Curve::deselect() {
+    selected = false;
 }
 
-// Get the nth point in the curve.
-QPointF Curve::getPoint(curve_size_type n)
-{
-    return points[n];
-}
-
-// Get a reference to the first point in the curve as a C array.
-QPointF* Curve::getPoints()
-{
-    return points.data();
+bool Curve::isSelected() {
+    return selected;
 }
 
 // Get the pixels occupied by the line between the (n-1)th and nth point
 // TODO: handle curves wider than 1px
-curve_raster_type Curve::getRasterPoints(curve_size_type n)
+Curve::raster_type Curve::getRasterPoints(size_type n)
 {
-    Q_ASSERT(n < points.size());
-    if (points.size() == 0) return curve_raster_type();
-    if (n == 0) return curve_raster_type(1, points[0].toPoint());
+    Q_ASSERT(n <= size());
+    if (size() == 0) return raster_type();
+    if (n == 0) return raster_type(1, at(0).toPoint());
 
-    curve_raster_type rasterPoints;
-    int x0 = int(points[n-1].x());
-    int y0 = int(points[n-1].y());
-    int x1 = int(points[n].x());
-    int y1 = int(points[n].y());
+    raster_type rasterPoints;
+    int x0, y0, x1, y1;
+    if (n < size()) {
+        x0 = int(at(n-1).x());
+        y0 = int(at(n-1).y());
+        x1 = int(at(n).x());
+        y1 = int(at(n).y());
+    } else {
+        // n==size() returns the pixels occupied by the line between the first
+        // and last points; useful for implicitly closed Curves
+        x0 = int(first().x());
+        y0 = int(first().y());
+        x1 = int(last().x());
+        y1 = int(last().y());
+    }
 
     // Bresenham's line drawing algorithm
     int dx = qAbs(x1-x0);
@@ -75,12 +73,6 @@ curve_raster_type Curve::getRasterPoints(curve_size_type n)
     }
 
     return rasterPoints;
-}
-
-// Get the number of points in the curve.
-curve_size_type Curve::size() const
-{
-    return points.size();
 }
 
 // Get the pen (style) of the curve.

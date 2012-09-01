@@ -35,6 +35,7 @@ void MainWindow::open()
 {
     QString path = QFileDialog::getOpenFileName(
                 this, tr("Open"), QDir::homePath(), tr("SVG files (*.svg)"));
+    noteEdit->clear();
     svgOpen(path, noteEdit);
 }
 

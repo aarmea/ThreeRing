@@ -5,13 +5,16 @@
 #include <QLinkedList>
 #include <QMap>
 #include "table.h"
+#include <QKeyEvent>
 #include <QTabletEvent>
 #include <QPainter>
 #include "curve.h"
-//TODO: make it work with a mouse, "mouseastablet.h"
+// TODO: make it work with a mouse, "mouseastablet.h"?
 
+// TODO: move these typedefs into the class
 typedef QLinkedList<Curve> drawing_type;
 typedef Table<drawing_type::iterator> bptr_type;
+typedef QMap<drawing_type::iterator, char> selection_type;
 
 bool operator<(const drawing_type::iterator &itr1,
                const drawing_type::iterator &itr2);
@@ -21,7 +24,16 @@ class NoteEditor : public QWidget
     Q_OBJECT
 public:
     explicit NoteEditor(QWidget *parent = 0);
+    void clear();
+
+    enum PenMode {PenPen, PenMouse, PenErase, PenSelect, PenMove};
+    enum MouseMode {MouseMouse, MousePen};
+
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
+
     void tabletEvent(QTabletEvent *event);
+
     void paintEvent(QPaintEvent *event);
     void paint(QPainter &painter);
     void paint(QPainter &painter, const QRect &clip);
@@ -36,6 +48,9 @@ public slots:
 
 private:
     bool tabletDown;
+    Qt::KeyboardModifiers keyMods;
+    PenMode penMode;
+    MouseMode mouseMode;
 
     drawing_type::iterator currentCurve;
     drawing_type drawing;
@@ -43,9 +58,19 @@ private:
     QPainter painter;
     QPoint ulCorner;
 
+    Curve selectionBound;
+    bool selectionActive;
+    selection_type selection;
+    QRect updateSelection();
+    void clearSelection();
+
+    void tabletPressEvent(QTabletEvent *event);
+    void tabletReleaseEvent(QTabletEvent *event);
+    void tabletMoveEvent(QTabletEvent *event);
+
     drawing_type::iterator getBackpointer(QPoint point) const;
-    bool eraseCurve(QPoint point);
-    void eraseCurve(drawing_type::iterator curve);
+    QRect eraseCurve(QPoint point);
+    QRect eraseCurve(drawing_type::iterator curve);
 };
 
 #endif // NOTEEDITOR_H
