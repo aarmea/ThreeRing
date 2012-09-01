@@ -33,6 +33,16 @@ void NoteEditor::clear()
 void NoteEditor::keyPressEvent(QKeyEvent *event)
 {
     keyMods = event->modifiers();
+
+    // Delete the selection (if present)
+    if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
+        for (selection_type::iterator itr = selection.begin();
+             itr != selection.end(); ++itr) {
+            eraseCurve(itr.key());
+        }
+        selection.clear();
+        clearSelection();
+    }
 }
 
 void NoteEditor::keyReleaseEvent(QKeyEvent *event)
