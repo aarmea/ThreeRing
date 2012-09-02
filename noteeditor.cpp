@@ -1,8 +1,8 @@
 #include "noteeditor.h"
 
 // Comparison for iterators for QMap in selection_type
-bool operator<(const drawing_type::iterator &itr1,
-               const drawing_type::iterator &itr2)
+bool operator<(const NoteEditor::drawing_type::iterator &itr1,
+               const NoteEditor::drawing_type::iterator &itr2)
 {
     return itr1.i < itr2.i;
 }
@@ -206,7 +206,7 @@ void NoteEditor::paint(QPainter &painter, const QRect &clip)
 }
 
 // Add a new curve to the drawing and get an iterator to it.
-drawing_type::iterator NoteEditor::getNewCurve()
+NoteEditor::drawing_type::iterator NoteEditor::getNewCurve()
 {
     drawing.push_back(Curve());
     drawing_type::iterator newCurve = drawing.end();
@@ -242,7 +242,8 @@ void NoteEditor::addBackpointer(QPoint point, drawing_type::iterator curve)
     backpointers.set(x, y, curve);
 }
 
-drawing_type::iterator NoteEditor::getBackpointer(QPoint point) const
+NoteEditor::drawing_type::iterator NoteEditor::getBackpointer(
+        QPoint point) const
 {
     int x = point.x();
     int y = point.y();

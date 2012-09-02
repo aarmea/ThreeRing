@@ -72,7 +72,7 @@ void svgParseGroup(const QDomElement &element, NoteEditor *editor, QPen pen)
             svgParseGroup(child, editor, pen);
         } else if (child.tagName() == "polyline") {
             // Get curve from points, add to editor
-            drawing_type::iterator curve = editor->getNewCurve();
+            NoteEditor::drawing_type::iterator curve = editor->getNewCurve();
             curve->setPen(pen);
             QStringList pointStrs = child.attribute("points")
                     .split(' ', QString::SkipEmptyParts);

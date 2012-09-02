@@ -11,14 +11,6 @@
 #include "curve.h"
 // TODO: make it work with a mouse, "mouseastablet.h"?
 
-// TODO: move these typedefs into the class
-typedef QLinkedList<Curve> drawing_type;
-typedef Table<drawing_type::iterator> bptr_type;
-typedef QMap<drawing_type::iterator, char> selection_type;
-
-bool operator<(const drawing_type::iterator &itr1,
-               const drawing_type::iterator &itr2);
-
 class NoteEditor : public QWidget
 {
     Q_OBJECT
@@ -38,6 +30,7 @@ public:
     void paint(QPainter &painter);
     void paint(QPainter &painter, const QRect &clip);
 
+    typedef QLinkedList<Curve> drawing_type;
     drawing_type::iterator getNewCurve();
     void addPointToCurve(QPointF point, drawing_type::iterator curve);
     void addBackpointer(QPoint point, drawing_type::iterator curve);
@@ -54,10 +47,11 @@ private:
 
     drawing_type::iterator currentCurve;
     drawing_type drawing;
-    bptr_type backpointers;
+    Table<drawing_type::iterator> backpointers;
     QPainter painter;
     QPoint ulCorner;
 
+    typedef QMap<drawing_type::iterator, char> selection_type;
     Curve selectionBound;
     bool selectionActive;
     selection_type selection;
@@ -72,5 +66,8 @@ private:
     QRect eraseCurve(QPoint point);
     QRect eraseCurve(drawing_type::iterator curve);
 };
+
+bool operator<(const NoteEditor::drawing_type::iterator &itr1,
+               const NoteEditor::drawing_type::iterator &itr2);
 
 #endif // NOTEEDITOR_H
