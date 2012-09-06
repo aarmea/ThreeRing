@@ -81,6 +81,7 @@ NoteEditor::PenMode NoteEditor::getPenMode() const
 QCursor NoteEditor::cursorFromPen(const QPen &pen)
 {
     // TODO: implement
+    return QCursor(); // dummy return
 }
 
 // Handle tablet events.
