@@ -81,6 +81,8 @@ NoteEditor::PenMode NoteEditor::getPenMode() const
 QCursor NoteEditor::cursorFromPen(const QPen &pen)
 {
     // TODO: implement
+    // Create a QPixmap, draw a single point in it,
+    // then create a QCursor from that QPixmap
     return QCursor(); // dummy return
 }
 
