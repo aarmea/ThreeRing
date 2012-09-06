@@ -7,6 +7,12 @@ Curve::Curve() :
 {
 }
 
+// Construct a curve with the given QPen
+Curve::Curve(QPen newPen) :
+    pen(newPen), selected(false)
+{
+}
+
 // Copy constructor.
 Curve::Curve(const Curve &otherCurve) :
     pen(otherCurve.pen), selected(otherCurve.selected)

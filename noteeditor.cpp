@@ -15,6 +15,8 @@ NoteEditor::NoteEditor(QWidget *parent) :
     selectionActive = false;
     keyMods = Qt::NoModifier;
     penMode = PenPen;
+    currentPen = QPen(QBrush(Qt::black), 1.0,
+                      Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     mouseMode = MouseMouse;
     setFocusPolicy(Qt::StrongFocus); // for Mac keyboards
     grabKeyboard();
@@ -50,6 +52,37 @@ void NoteEditor::keyReleaseEvent(QKeyEvent *event)
     keyMods = event->modifiers();
 }
 
+// Setters and getters for penMode
+void NoteEditor::setPenMode(PenMode newPenMode)
+{
+    // TODO: set pen mode when shift or alt is pressed or eraser detected
+    penMode = newPenMode;
+    switch (penMode) {
+    /* TODO: for case PenPen, make the cursor the current pen
+    case PenPen:
+        setCursor(cursorFromPen(QPen pen));
+        break;
+    */
+    case PenSelect:
+        setCursor(Qt::CrossCursor);
+        break;
+    default:
+        setCursor(Qt::ArrowCursor);
+        break;
+    }
+}
+
+NoteEditor::PenMode NoteEditor::getPenMode() const
+{
+    return penMode;
+}
+
+// Create a cursor from the given pen.
+QCursor NoteEditor::cursorFromPen(const QPen &pen)
+{
+    // TODO: implement
+}
+
 // Handle tablet events.
 void NoteEditor::tabletEvent(QTabletEvent *event)
 {
@@ -77,40 +110,41 @@ void NoteEditor::tabletPressEvent(QTabletEvent *event)
     tabletDown = true;
     clearSelection();
     if (keyMods & Qt::ShiftModifier) {
-        penMode = PenSelect;
+        // penMode = PenSelect;
+        setPenMode(PenSelect);
         selectionActive = true;
         selectionBound.append(event->pos());
-        // update();
     } else if (event->pointerType() == QTabletEvent::Eraser ||
                keyMods & Qt::AltModifier) {
-        penMode = PenErase;
+        // penMode = PenErase;
+        setPenMode(PenErase);
         eraseCurve(event->pos());
-        // update();
     } else if (event->pointerType() == QTabletEvent::Pen) {
-        penMode = PenPen;
+        // penMode = PenPen;
+        setPenMode(PenPen);
         currentCurve = getNewCurve();
         addPointToCurve(event->hiResGlobalPos()-ulCorner, currentCurve);
-        // update(event->x()-16, event->y()-16, 32, 32);
     }
 }
 
 void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
 {
     tabletDown = false;
-    if (penMode == PenSelect) {
+    if (getPenMode() == PenSelect) {
         QRect updateRect = selectionBound.boundingRect().toAlignedRect();
         updateRect.adjust(-5, -5, 5, 5);
         update(updateRect);
         selectionActive = false;
     }
-    penMode = PenPen; // TODO: handle moving a selection
+    // penMode = PenPen;
+    setPenMode(PenPen); // TODO: handle moving a selection
 }
 
 void NoteEditor::tabletMoveEvent(QTabletEvent *event)
 {
     QRect updateRect;
     if (tabletDown) {
-        switch (penMode) {
+        switch (getPenMode()) {
         case PenPen:
             addPointToCurve(event->hiResGlobalPos()-ulCorner, currentCurve);
             updateRect = currentCurve->boundingRect().toAlignedRect();
@@ -208,7 +242,7 @@ void NoteEditor::paint(QPainter &painter, const QRect &clip)
 // Add a new curve to the drawing and get an iterator to it.
 NoteEditor::drawing_type::iterator NoteEditor::getNewCurve()
 {
-    drawing.push_back(Curve());
+    drawing.push_back(Curve(currentPen));
     drawing_type::iterator newCurve = drawing.end();
     --newCurve;
     return newCurve;

@@ -18,11 +18,14 @@ public:
     explicit NoteEditor(QWidget *parent = 0);
     void clear();
 
-    enum PenMode {PenPen, PenMouse, PenErase, PenSelect, PenMove};
-    enum MouseMode {MouseMouse, MousePen};
-
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+
+    enum PenMode {PenPen, PenMouse, PenErase, PenSelect, PenMove};
+    enum MouseMode {MouseMouse, MousePen};
+    void setPenMode(PenMode newPenMode);
+    PenMode getPenMode() const;
+    QCursor cursorFromPen(const QPen &pen);
 
     void tabletEvent(QTabletEvent *event);
 
@@ -45,6 +48,7 @@ private:
     PenMode penMode;
     MouseMode mouseMode;
 
+    QPen currentPen;
     drawing_type::iterator currentCurve;
     drawing_type drawing;
     Table<drawing_type::iterator> backpointers;

@@ -11,6 +11,7 @@ class Curve : public QPolygonF
 public:
     explicit Curve();
     Curve(const Curve &otherCurve);
+    Curve(QPen newPen);
 
     void select();
     void deselect();
