@@ -58,11 +58,9 @@ void NoteEditor::setPenMode(PenMode newPenMode)
     // TODO: set pen mode when shift or alt is pressed or eraser detected
     penMode = newPenMode;
     switch (penMode) {
-    /* TODO: for case PenPen, make the cursor the current pen
     case PenPen:
-        setCursor(cursorFromPen(QPen pen));
+        setCursor(cursorFromPen(currentPen));
         break;
-    */
     case PenSelect:
         setCursor(Qt::CrossCursor);
         break;
@@ -80,10 +78,14 @@ NoteEditor::PenMode NoteEditor::getPenMode() const
 // Create a cursor from the given pen.
 QCursor NoteEditor::cursorFromPen(const QPen &pen)
 {
-    // TODO: implement
     // Create a QPixmap, draw a single point in it,
     // then create a QCursor from that QPixmap
-    return QCursor(); // dummy return
+    QPixmap pixmap(32, 32);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setPen(currentPen);
+    painter.drawPoint(QPoint(16, 16));
+    return QCursor(pixmap);
 }
 
 // Handle tablet events.
