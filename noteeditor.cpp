@@ -83,7 +83,10 @@ QCursor NoteEditor::cursorFromPen(const QPen &pen)
     QPixmap pixmap(32, 32);
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
-    painter.setPen(currentPen);
+    painter.setRenderHint(QPainter::Antialiasing);
+    QPen newPen = currentPen;
+    newPen.setWidthF(newPen.widthF()+0.5);
+    painter.setPen(newPen);
     painter.drawPoint(QPoint(16, 16));
     return QCursor(pixmap);
 }
