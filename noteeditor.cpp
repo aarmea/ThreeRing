@@ -96,6 +96,15 @@ void NoteEditor::tabletEvent(QTabletEvent *event)
 {
     ulCorner = mapToGlobal(QPoint(0,0));
 
+    if (keyMods & Qt::ShiftModifier) {
+        setPenMode(PenSelect);
+    } else if (event->pointerType() == QTabletEvent::Eraser ||
+            keyMods & Qt::AltModifier) {
+        setPenMode(PenErase);
+    } else if (event->pointerType() == QTabletEvent::Pen) {
+        setPenMode(PenPen);
+    }
+
     // TODO: handle case (penMode == PenMouse)
     switch (event->type()) {
     case QEvent::TabletPress:
@@ -118,18 +127,15 @@ void NoteEditor::tabletPressEvent(QTabletEvent *event)
     tabletDown = true;
     clearSelection();
     if (keyMods & Qt::ShiftModifier) {
-        // penMode = PenSelect;
-        setPenMode(PenSelect);
+        // setPenMode(PenSelect);
         selectionActive = true;
         selectionBound.append(event->pos());
     } else if (event->pointerType() == QTabletEvent::Eraser ||
                keyMods & Qt::AltModifier) {
-        // penMode = PenErase;
-        setPenMode(PenErase);
+        // setPenMode(PenErase);
         eraseCurve(event->pos());
     } else if (event->pointerType() == QTabletEvent::Pen) {
-        // penMode = PenPen;
-        setPenMode(PenPen);
+        // setPenMode(PenPen);
         currentCurve = getNewCurve();
         addPointToCurve(event->hiResGlobalPos()-ulCorner, currentCurve);
     }
