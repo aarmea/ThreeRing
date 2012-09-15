@@ -55,7 +55,9 @@ void NoteEditor::keyReleaseEvent(QKeyEvent *event)
 // Setters and getters for penMode
 void NoteEditor::setPenMode(PenMode newPenMode)
 {
-    // TODO: set pen mode when shift or alt is pressed or eraser detected
+    // Should only work if pen is up
+    if (tabletDown) return;
+
     penMode = newPenMode;
     switch (penMode) {
     case PenPen:
