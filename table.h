@@ -2,6 +2,7 @@
 #define TABLE_H
 
 #include <QObject>
+#include <stdint.h>
 
 typedef uintptr_t table_size_type;
 
