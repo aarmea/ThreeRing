@@ -19,7 +19,7 @@ NoteEditor::NoteEditor(QWidget *parent) :
                       Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     mouseMode = MouseMouse;
     setFocusPolicy(Qt::StrongFocus); // for Mac keyboards
-    grabKeyboard();
+    // grabKeyboard();
     backpointers.resize(width()*2, height()*2, NULL);
 }
 
@@ -127,17 +127,15 @@ void NoteEditor::tabletEvent(QTabletEvent *event)
 void NoteEditor::tabletPressEvent(QTabletEvent *event)
 {
     tabletDown = true;
+    grabKeyboard();
     clearSelection();
     if (keyMods & Qt::ShiftModifier) {
-        // setPenMode(PenSelect);
         selectionActive = true;
         selectionBound.append(event->pos());
     } else if (event->pointerType() == QTabletEvent::Eraser ||
                keyMods & Qt::AltModifier) {
-        // setPenMode(PenErase);
         eraseCurve(event->pos());
     } else if (event->pointerType() == QTabletEvent::Pen) {
-        // setPenMode(PenPen);
         currentCurve = getNewCurve();
         addPointToCurve(event->hiResGlobalPos()-ulCorner, currentCurve);
     }
@@ -146,14 +144,14 @@ void NoteEditor::tabletPressEvent(QTabletEvent *event)
 void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
 {
     tabletDown = false;
+    releaseKeyboard();
     if (getPenMode() == PenSelect) {
         QRect updateRect = selectionBound.boundingRect().toAlignedRect();
         updateRect.adjust(-5, -5, 5, 5);
         update(updateRect);
         selectionActive = false;
     }
-    // penMode = PenPen;
-    setPenMode(PenPen); // TODO: handle moving a selection
+    // setPenMode(PenPen); // TODO: handle moving a selection
 }
 
 void NoteEditor::tabletMoveEvent(QTabletEvent *event)
@@ -330,7 +328,6 @@ QRect NoteEditor::updateSelection() {
         // yes, "<=" in conditional to check the implicit closing edge
         Curve::raster_type edge = selectionBound.getRasterPoints(i);
         for (Curve::raster_type::size_type j = 0; j < edge.size(); ++j) {
-            // newSelection.remove(getBackpointer(edge[j]));
             QPoint point = edge[j];
             for (int x = -1; x <= 1; ++x) {
                 for (int y = -1; y <= 1; ++y) {
