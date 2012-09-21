@@ -66,6 +66,10 @@ void NoteEditor::setPenMode(PenMode newPenMode)
     case PenSelect:
         setCursor(Qt::CrossCursor);
         break;
+    case PenErase:
+        // TODO: fix!
+        setCursor(QCursor(QPixmap(":/images/eraser.bmp"), 6, 6));
+        break;
     default:
         setCursor(Qt::ArrowCursor);
         break;

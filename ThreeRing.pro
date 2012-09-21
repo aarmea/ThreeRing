@@ -13,3 +13,6 @@ HEADERS += \
     noteeditor.h \
     table.h \
     svgfileio.h
+
+RESOURCES += \
+    images.qrc
