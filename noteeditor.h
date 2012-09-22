@@ -43,6 +43,8 @@ signals:
 public slots:
 
 private:
+    typedef QMap<drawing_type::iterator, char> selection_type;
+
     bool tabletDown;
     Qt::KeyboardModifiers keyMods;
     PenMode penMode;
@@ -51,11 +53,11 @@ private:
     QPen currentPen;
     drawing_type::iterator currentCurve;
     drawing_type drawing;
-    Table<drawing_type::iterator> backpointers;
+    // Table<drawing_type::iterator> backpointers;
+    Table<selection_type> backpointers;
     QPainter painter;
     QPoint ulCorner;
 
-    typedef QMap<drawing_type::iterator, char> selection_type;
     Curve selectionBound;
     bool selectionActive;
     selection_type selection;
@@ -66,7 +68,7 @@ private:
     void tabletReleaseEvent(QTabletEvent *event);
     void tabletMoveEvent(QTabletEvent *event);
 
-    drawing_type::iterator getBackpointer(QPoint point) const;
+    selection_type getBackpointers(QPoint point) const;
     QRect eraseCurve(QPoint point);
     QRect eraseCurve(drawing_type::iterator curve);
 };

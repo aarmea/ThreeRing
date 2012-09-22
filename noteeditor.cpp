@@ -20,7 +20,7 @@ NoteEditor::NoteEditor(QWidget *parent) :
     mouseMode = MouseMouse;
     setFocusPolicy(Qt::StrongFocus); // for Mac keyboards
     // grabKeyboard();
-    backpointers.resize(width()*2, height()*2, NULL);
+    backpointers.resize(width()*2, height()*2, selection_type());
 }
 
 // Clear the entire document.
@@ -28,7 +28,7 @@ void NoteEditor::clear()
 {
     drawing.clear();
     backpointers.resize(0, 0);
-    backpointers.resize(width()*2, height()*2, NULL);
+    backpointers.resize(width()*2, height()*2, selection_type());
 }
 
 // Handle keyboard events.
@@ -225,10 +225,18 @@ void NoteEditor::paint(QPainter &painter, const QRect &clip)
             if (clip.x()+i >= backpointers.numRows()-1) continue;
             for (int j = 0; j < clip.height(); ++j) {
                 if (clip.y()+j >= backpointers.numColumns()-1) continue;
-                drawing_type::iterator curvePtr =
+                /* drawing_type::iterator curvePtr =
+                        backpointers.get(clip.x()+i, clip.y()+j); */
+                selection_type curvePtrs =
                         backpointers.get(clip.x()+i, clip.y()+j);
-                if (curvePtr.i)
-                    curves[curvePtr] = 1;
+                /* if (curvePtr.i)
+                    curves[curvePtr] = 1; */
+                selection_type::iterator itr;
+                for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
+                    drawing_type::iterator curvePtr = itr.key();
+                    if (curvePtr.i)
+                        curves[curvePtr] = 1;
+                }
             }
         }
         selection_type::iterator itr;
@@ -284,22 +292,24 @@ void NoteEditor::addBackpointer(QPoint point, drawing_type::iterator curve)
     table_size_type x = point.x();
     table_size_type y = point.y();
     if (x > backpointers.numRows()-1 && y > backpointers.numColumns()-1) {
-        backpointers.resize(x*2, y*2, NULL);
+        backpointers.resize(x*2, y*2, selection_type());
     } else if (x > backpointers.numRows()-1) {
-        backpointers.resize(x*2, backpointers.numColumns(), NULL);
+        backpointers.resize(x*2, backpointers.numColumns(), selection_type());
     } else if (y > backpointers.numColumns()-1) {
-        backpointers.resize(backpointers.numRows(), y*2, NULL);
+        backpointers.resize(backpointers.numRows(), y*2, selection_type());
     }
-    backpointers.set(x, y, curve);
+    selection_type curves = backpointers.get(x, y);
+    curves[curve] = 1;
+    backpointers.set(x, y, curves);
 }
 
-NoteEditor::drawing_type::iterator NoteEditor::getBackpointer(
+NoteEditor::selection_type NoteEditor::getBackpointers(
         QPoint point) const
 {
     int x = point.x();
     int y = point.y();
-    if (x < 0 || x > width()) return drawing_type::iterator();
-    if (y < 0 || y > height()) return drawing_type::iterator();
+    if (x < 0 || x > width()) return selection_type();
+    if (y < 0 || y > height()) return selection_type();
     return backpointers.get(point.x(), point.y());
 }
 
@@ -317,10 +327,18 @@ QRect NoteEditor::updateSelection() {
         for (int x = rect.left(); x <= rect.right(); ++x) {
             for (int y = rect.top(); y <= rect.bottom(); ++y) {
                 QPoint newPoint(x, y);
-                drawing_type::iterator curvePtr = getBackpointer(newPoint);
-                if (curvePtr.i) {
+                selection_type curvePtrs = getBackpointers(newPoint);
+                /* if (curvePtr.i) {
                     newSelection.insert(curvePtr, 1);
                     curvePtr->select();
+                } */
+                selection_type::iterator itr;
+                for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
+                    drawing_type::iterator curvePtr = itr.key();
+                    if (curvePtr.i) {
+                        newSelection.insert(curvePtr, 1);
+                        curvePtr->select();
+                    }
                 }
             }
         }
@@ -335,9 +353,17 @@ QRect NoteEditor::updateSelection() {
             for (int x = -1; x <= 1; ++x) {
                 for (int y = -1; y <= 1; ++y) {
                     QPoint newPoint(point.x()+x, point.y()+y);
-                    drawing_type::iterator curvePtr = getBackpointer(newPoint);
+                    /* drawing_type::iterator curvePtr = getBackpointer(newPoint);
                     if (newSelection.remove(curvePtr)) {
                         curvePtr->deselect();
+                    } */
+                    selection_type curvePtrs = getBackpointers(newPoint);
+                    selection_type::iterator itr;
+                    for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
+                        drawing_type::iterator curvePtr = itr.key();
+                        if (newSelection.remove(curvePtr)) {
+                            curvePtr->deselect();
+                        }
                     }
                 }
             }
@@ -371,16 +397,15 @@ void NoteEditor::clearSelection()
 // Erase a curve at the given point.
 QRect NoteEditor::eraseCurve(QPoint point)
 {
-    drawing_type::iterator curve;
     for (int x = -2; x <= 2; ++x) {
         if (point.x()+x < 0 || point.x()+x > backpointers.numRows()-1)
             continue;
         for (int y = -2; y <= 2; ++y) {
             if (point.y()+y < 0 || point.y()+y > backpointers.numColumns()-1)
                 continue;
-            curve = backpointers.get(point.x()+x, point.y()+y);
-            if (curve.i) {
-                return eraseCurve(curve);
+            selection_type curves = backpointers.get(point.x()+x, point.y()+y);
+            if (curves.begin() != curves.end()) {
+                return eraseCurve(curves.begin().key());
             }
         }
     }
@@ -400,7 +425,10 @@ QRect NoteEditor::eraseCurve(drawing_type::iterator curve)
                 continue;
             if (point.y() < 0 || point.y() > backpointers.numColumns()-1)
                 continue;
-            backpointers.set(point.x(), point.y(), NULL);
+            // backpointers.set(point.x(), point.y(), NULL);
+            selection_type curves = backpointers.get(point.x(), point.y());
+            curves.remove(curve);
+            backpointers.set(point.x(), point.y(), curves);
         }
     }
     QRect rect = curve->boundingRect().toAlignedRect();
