@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/images">
-        <file>images/eraser.bmp</file>
+        <file>images/eraser.png</file>
     </qresource>
 </RCC>
