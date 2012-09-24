@@ -64,7 +64,7 @@ private:
     Curve selectionBound;
     bool selectionActive;
     selection_type selection;
-    QRect updateSelection();
+    void updateSelection();
     void clearSelection();
 
     void tabletPressEvent(QTabletEvent *event);

@@ -159,28 +159,22 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
 
 void NoteEditor::tabletMoveEvent(QTabletEvent *event)
 {
-    QRect updateRect;
     if (tabletDown) {
         switch (getPenMode()) {
         case PenPen:
             addPointToCurve(event->hiResGlobalPos()-ulCorner, currentCurve);
-            updateRect = currentCurve->boundingRect().toAlignedRect();
+            updateAround(currentCurve->boundingRect().toAlignedRect());
             break;
         case PenErase:
             eraseCurve(event->pos());
             break;
         case PenSelect:
             selectionBound.append(event->hiResGlobalPos()-ulCorner);
-            updateRect = updateSelection();
+            updateSelection();
             break;
         default:
             break;
         }
-    }
-    if (!updateRect.isNull()) {
-        qDebug() << "tabletMoveEvent() --> " << updateRect;
-        updateRect.adjust(-5, -5, 5, 5);
-        update(updateRect);
     }
 }
 
@@ -317,7 +311,7 @@ NoteEditor::selection_type NoteEditor::getBackpointers(
 }
 
 // Maintain the selection.
-QRect NoteEditor::updateSelection() {
+void NoteEditor::updateSelection() {
     // TODO: speed up by only checking the new area at each point
 
     selection_type newSelection;
@@ -367,7 +361,7 @@ QRect NoteEditor::updateSelection() {
 
     selection = newSelection;
 
-    return selectionBound.boundingRect().toAlignedRect();
+    updateAround(selectionBound.boundingRect().toAlignedRect());
 }
 
 // Clear the selection.
@@ -400,7 +394,6 @@ void NoteEditor::eraseCurve(QPoint point)
                 continue;
             selection_type curves = backpointers.get(point.x()+x, point.y()+y);
             if (curves.begin() != curves.end()) {
-                // TODO: fix - doesn't redraw if there are multiple curves
                 eraseCurve(curves.begin().key());
             }
         }
