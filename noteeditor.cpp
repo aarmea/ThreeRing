@@ -167,7 +167,7 @@ void NoteEditor::tabletMoveEvent(QTabletEvent *event)
             updateRect = currentCurve->boundingRect().toAlignedRect();
             break;
         case PenErase:
-            updateRect = eraseCurve(event->pos());
+            eraseCurve(event->pos());
             break;
         case PenSelect:
             selectionBound.append(event->hiResGlobalPos()-ulCorner);
@@ -178,6 +178,7 @@ void NoteEditor::tabletMoveEvent(QTabletEvent *event)
         }
     }
     if (!updateRect.isNull()) {
+        qDebug() << "tabletMoveEvent() --> " << updateRect;
         updateRect.adjust(-5, -5, 5, 5);
         update(updateRect);
     }
@@ -258,6 +259,12 @@ void NoteEditor::paint(QPainter &painter, const QRect &clip)
         painter.drawPolyline(selectionBound);
         painter.drawLine(selectionBound.last(), selectionBound.first());
     }
+}
+
+void NoteEditor::updateAround(QRect updateRect, int dist)
+{
+    updateRect.adjust(-dist, -dist, dist, dist);
+    update(updateRect);
 }
 
 // Add a new curve to the drawing and get an iterator to it.
@@ -383,7 +390,7 @@ void NoteEditor::clearSelection()
 }
 
 // Erase a curve at the given point.
-QRect NoteEditor::eraseCurve(QPoint point)
+void NoteEditor::eraseCurve(QPoint point)
 {
     for (int x = -2; x <= 2; ++x) {
         if (point.x()+x < 0 || point.x()+x > backpointers.numRows()-1)
@@ -394,15 +401,14 @@ QRect NoteEditor::eraseCurve(QPoint point)
             selection_type curves = backpointers.get(point.x()+x, point.y()+y);
             if (curves.begin() != curves.end()) {
                 // TODO: fix - doesn't redraw if there are multiple curves
-                return eraseCurve(curves.begin().key());
+                eraseCurve(curves.begin().key());
             }
         }
     }
-    return QRect();
 }
 
 // Erase the curve specified by the iterator.
-QRect NoteEditor::eraseCurve(drawing_type::iterator curve)
+void NoteEditor::eraseCurve(drawing_type::iterator curve)
 {
     Curve::size_type numPoints = curve->size();
 
@@ -421,5 +427,6 @@ QRect NoteEditor::eraseCurve(drawing_type::iterator curve)
     }
     QRect rect = curve->boundingRect().toAlignedRect();
     drawing.erase(curve);
-    return rect;
+    qDebug() << "eraseCurve() --> " << rect;
+    updateAround(rect);
 }

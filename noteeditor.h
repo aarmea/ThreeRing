@@ -1,6 +1,8 @@
 #ifndef NOTEEDITOR_H
 #define NOTEEDITOR_H
 
+#include <QDebug>
+
 #include <QWidget>
 #include <QLinkedList>
 #include <QMap>
@@ -32,6 +34,7 @@ public:
     void paintEvent(QPaintEvent *event);
     void paint(QPainter &painter);
     void paint(QPainter &painter, const QRect &clip);
+    void updateAround(QRect updateRect, int dist = 5);
 
     typedef QLinkedList<Curve> drawing_type;
     drawing_type::iterator getNewCurve();
@@ -69,8 +72,8 @@ private:
     void tabletMoveEvent(QTabletEvent *event);
 
     selection_type getBackpointers(QPoint point) const;
-    QRect eraseCurve(QPoint point);
-    QRect eraseCurve(drawing_type::iterator curve);
+    void eraseCurve(QPoint point);
+    void eraseCurve(drawing_type::iterator curve);
 };
 
 bool operator<(const NoteEditor::drawing_type::iterator &itr1,
