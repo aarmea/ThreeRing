@@ -105,7 +105,19 @@ void NoteEditor::tabletEvent(QTabletEvent *event)
 {
     ulCorner = mapToGlobal(QPoint(0,0));
 
-    if (keyMods & Qt::ShiftModifier) {
+    selection_type surPoints;
+    for (int x = -4; x <= 4; ++x) {
+        for (int y = -4; y <= 4; ++y) {
+            QPoint point = QPoint(event->pos().x()+x, event->pos().y()+y);
+            surPoints = surPoints.unite(getBackpointers(point));
+        }
+    }
+    QList<drawing_type::iterator> uniqueCurves = surPoints.uniqueKeys();
+
+    if (uniqueCurves.begin() != uniqueCurves.end() &&
+            (*uniqueCurves.begin())->isSelected()) {
+        setPenMode(PenMove);
+    } else if (keyMods & Qt::ShiftModifier) {
         setPenMode(PenSelect);
     } else if (event->pointerType() == QTabletEvent::Eraser ||
             keyMods & Qt::AltModifier) {
@@ -152,7 +164,6 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
 {
     tabletDown = false;
     releaseKeyboard();
-    // TODO: handle moving a selection when the cursor is over a selected curve
     if (getPenMode() == PenSelect) {
         updateAround(selectionBound.boundingRect().toAlignedRect());
         selectionActive = false;
