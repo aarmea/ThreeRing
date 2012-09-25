@@ -61,13 +61,17 @@ void NoteEditor::setPenMode(PenMode newPenMode)
     penMode = newPenMode;
     switch (penMode) {
     case PenPen:
+        // TODO: use the ":/images/pencil.png" cursor if MousePen
         setCursor(cursorFromPen(currentPen));
+        break;
+    case PenErase:
+        setCursor(QCursor(QPixmap(":/images/eraser.png"), 6, 6));
         break;
     case PenSelect:
         setCursor(Qt::CrossCursor);
         break;
-    case PenErase:
-        setCursor(QCursor(QPixmap(":/images/eraser.png"), 6, 6));
+    case PenMove:
+        setCursor(QCursor(QPixmap(":/images/move.png")));
         break;
     default:
         setCursor(Qt::ArrowCursor);
@@ -148,13 +152,11 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
 {
     tabletDown = false;
     releaseKeyboard();
+    // TODO: handle moving a selection when the cursor is over a selected curve
     if (getPenMode() == PenSelect) {
-        QRect updateRect = selectionBound.boundingRect().toAlignedRect();
-        updateRect.adjust(-5, -5, 5, 5);
-        update(updateRect);
+        updateAround(selectionBound.boundingRect().toAlignedRect());
         selectionActive = false;
     }
-    // setPenMode(PenPen); // TODO: handle moving a selection
 }
 
 void NoteEditor::tabletMoveEvent(QTabletEvent *event)
@@ -378,8 +380,7 @@ void NoteEditor::clearSelection()
     selectionActive = false;
 
     if (!selectionRect.isNull()) {
-        selectionRect.adjust(-5, -5, 5, 5);
-        update(selectionRect);
+        updateAround(selectionRect);
     }
 }
 

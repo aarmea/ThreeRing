@@ -56,7 +56,6 @@ private:
     QPen currentPen;
     drawing_type::iterator currentCurve;
     drawing_type drawing;
-    // Table<drawing_type::iterator> backpointers;
     Table<selection_type> backpointers;
     QPainter painter;
     QPoint ulCorner;

@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>images/eraser.png</file>
         <file>images/pencil.png</file>
+        <file>images/move.png</file>
     </qresource>
 </RCC>
