@@ -71,6 +71,7 @@ private:
     void tabletMoveEvent(QTabletEvent *event);
 
     selection_type getBackpointers(QPoint point) const;
+    void removeBackpointers(drawing_type::iterator curve);
     void eraseCurve(QPoint point);
     void eraseCurve(drawing_type::iterator curve);
 };
