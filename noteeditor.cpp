@@ -105,6 +105,7 @@ void NoteEditor::tabletEvent(QTabletEvent *event)
 {
     ulCorner = mapToGlobal(QPoint(0,0));
 
+    // Check the surrounding points for selected Curves
     selection_type surPoints;
     for (int x = -4; x <= 4; ++x) {
         for (int y = -4; y <= 4; ++y) {
@@ -114,6 +115,7 @@ void NoteEditor::tabletEvent(QTabletEvent *event)
     }
     QList<drawing_type::iterator> uniqueCurves = surPoints.uniqueKeys();
 
+    // Change the penMode accordingly
     if (uniqueCurves.begin() != uniqueCurves.end() &&
             (*uniqueCurves.begin())->isSelected()) {
         setPenMode(PenMove);
@@ -147,16 +149,24 @@ void NoteEditor::tabletPressEvent(QTabletEvent *event)
 {
     tabletDown = true;
     grabKeyboard();
-    clearSelection();
-    if (keyMods & Qt::ShiftModifier) {
+    if (getPenMode() != PenMove) {
+        clearSelection();
+    }
+
+    switch (getPenMode()) {
+    case PenSelect:
         selectionActive = true;
         selectionBound.append(event->pos());
-    } else if (event->pointerType() == QTabletEvent::Eraser ||
-               keyMods & Qt::AltModifier) {
+        break;
+    case PenErase:
         eraseCurve(event->pos());
-    } else if (event->pointerType() == QTabletEvent::Pen) {
+        break;
+    case PenPen:
         currentCurve = getNewCurve();
         addPointToCurve(event->hiResGlobalPos()-ulCorner, currentCurve);
+        break;
+    default:
+        break;
     }
 }
 
