@@ -59,17 +59,21 @@ private:
     Table<selection_type> backpointers;
     QPainter painter;
     QPoint ulCorner;
+    QPointF curTabletPos;
+    QPointF lastTabletPos;
 
     Curve selectionBound;
     bool selectionActive;
     selection_type selection;
     void updateSelection();
+    void moveSelection(QPointF distance);
     void clearSelection();
 
     void tabletPressEvent(QTabletEvent *event);
     void tabletReleaseEvent(QTabletEvent *event);
     void tabletMoveEvent(QTabletEvent *event);
 
+    void addBackpointers(drawing_type::iterator curve);
     selection_type getBackpointers(QPoint point) const;
     void removeBackpointers(drawing_type::iterator curve);
     void eraseCurve(QPoint point);

@@ -165,9 +165,6 @@ void NoteEditor::tabletPressEvent(QTabletEvent *event)
         selectionActive = true;
         selectionBound.append(event->pos());
         break;
-    case PenMove:
-        // TODO: implement!
-        break;
     default:
         break;
     }
@@ -182,9 +179,6 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
         updateAround(selectionBound.boundingRect().toAlignedRect());
         selectionActive = false;
         break;
-    case PenMove:
-        // TODO: implement!
-        break;
     default:
         break;
     }
@@ -192,6 +186,9 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
 
 void NoteEditor::tabletMoveEvent(QTabletEvent *event)
 {
+    lastTabletPos = curTabletPos;
+    curTabletPos = event->hiResGlobalPos();
+
     if (tabletDown) {
         switch (getPenMode()) {
         case PenPen:
@@ -206,7 +203,7 @@ void NoteEditor::tabletMoveEvent(QTabletEvent *event)
             updateSelection();
             break;
         case PenMove:
-            // TODO: implement!
+            moveSelection(curTabletPos - lastTabletPos);
             break;
         default:
             break;
@@ -336,6 +333,23 @@ void NoteEditor::addBackpointer(QPoint point, drawing_type::iterator curve)
     backpointers.set(x, y, curves);
 }
 
+// Add all of the backpointers to a given curve.
+void NoteEditor::addBackpointers(drawing_type::iterator curve)
+{
+    Curve::size_type numPoints = curve->size();
+    for (Curve::size_type i = 0; i < numPoints; ++i) {
+        Curve::raster_type rasterPoints = curve->getRasterPoints(i);
+        for (Curve::size_type j = 0; j < rasterPoints.size(); ++j) {
+            QPoint point = rasterPoints[j];
+            if (point.x() < 0 || point.x() > backpointers.numRows()-1)
+                continue;
+            if (point.y() < 0 || point.y() > backpointers.numColumns()-1)
+                continue;
+            addBackpointer(point, curve);
+        }
+    }
+}
+
 // Get all of the backpointers at a given point.
 NoteEditor::selection_type NoteEditor::getBackpointers(
         QPoint point) const
@@ -359,7 +373,7 @@ void NoteEditor::removeBackpointers(drawing_type::iterator curve)
                 continue;
             if (point.y() < 0 || point.y() > backpointers.numColumns()-1)
                 continue;
-            selection_type curves = backpointers.get(point.x(), point.y());
+            selection_type curves = getBackpointers(point);
             curves.remove(curve);
             backpointers.set(point.x(), point.y(), curves);
         }
@@ -419,6 +433,18 @@ void NoteEditor::updateSelection() {
     selection = newSelection;
 
     updateAround(selectionBound.boundingRect().toAlignedRect());
+}
+
+// Move the selection in the direction of distance relative to the origin.
+void NoteEditor::moveSelection(QPointF distance)
+{
+    selection_type::iterator itr;
+    for (itr = selection.begin(); itr != selection.end(); ++itr) {
+        removeBackpointers(itr.key());
+        itr.key()->translate(distance);
+        addBackpointers(itr.key()); // TODO: implement addBackpointers
+        updateAround(itr.key()->boundingRect().toAlignedRect());
+    }
 }
 
 // Clear the selection.
