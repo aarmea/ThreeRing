@@ -7,8 +7,13 @@ MainWindow::MainWindow(QWidget *parent) :
     saveAction = new QAction(tr("&Save"), this);
     exitAction = new QAction(tr("E&xit"), this);
 
+    mainWidget = new QWidget;
+    mainLayout = new QVBoxLayout;
     noteEdit = new NoteEditor;
-    setCentralWidget(noteEdit);
+    // TODO: add a ribbon-like interface
+    mainLayout->addWidget(noteEdit);
+    mainWidget->setLayout(mainLayout);
+    setCentralWidget(mainWidget);
 
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
     connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));

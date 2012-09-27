@@ -5,6 +5,7 @@
 #include <QCloseEvent>
 #include <QMenu>
 #include <QMenuBar>
+#include <QVBoxLayout>
 #include <QMessageBox>
 #include "noteeditor.h"
 #include "svgfileio.h"
@@ -23,6 +24,8 @@ public slots:
     void save();
     
 private:
+    QWidget *mainWidget;
+    QVBoxLayout *mainLayout;
     NoteEditor *noteEdit;
 
     QMenu *fileMenu;
