@@ -5,14 +5,16 @@ SOURCES += \
     mainwindow.cpp \
     curve.cpp \
     noteeditor.cpp \
-    svgfileio.cpp
+    svgfileio.cpp \
+    ribbon.cpp
 
 HEADERS += \
     mainwindow.h \
     curve.h \
     noteeditor.h \
     table.h \
-    svgfileio.h
+    svgfileio.h \
+    ribbon.h
 
 RESOURCES += \
     images.qrc

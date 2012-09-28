@@ -9,8 +9,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mainWidget = new QWidget;
     mainLayout = new QVBoxLayout;
+    ribbon = new Ribbon;
     noteEdit = new NoteEditor;
+
     // TODO: add a ribbon-like interface
+    mainLayout->addWidget(ribbon);
     mainLayout->addWidget(noteEdit);
     mainWidget->setLayout(mainLayout);
     setCentralWidget(mainWidget);

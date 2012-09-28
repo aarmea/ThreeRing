@@ -7,6 +7,7 @@
 #include <QMenuBar>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include "ribbon.h"
 #include "noteeditor.h"
 #include "svgfileio.h"
 
@@ -26,6 +27,7 @@ public slots:
 private:
     QWidget *mainWidget;
     QVBoxLayout *mainLayout;
+    Ribbon *ribbon;
     NoteEditor *noteEdit;
 
     QMenu *fileMenu;
