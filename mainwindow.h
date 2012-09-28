@@ -30,13 +30,6 @@ private:
     Ribbon *ribbon;
     NoteEditor *noteEdit;
 
-    /*
-    QMenu *fileMenu;
-    QAction *openAction;
-    QAction *saveAction;
-    QAction *exitAction;
-    */
-
     bool quitConfirm();
 
 private slots:

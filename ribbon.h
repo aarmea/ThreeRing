@@ -23,10 +23,10 @@ public slots:
 private:
     QTabWidget *tabs;
 
-    void initFileTab();
-    QWidget *fileTab;
-    QHBoxLayout *fileTabLayout;
-    int fileTabId;
+    void initHomeTab();
+    QWidget *homeTab;
+    QHBoxLayout *homeTabLayout;
+    int homeTabId;
     QPushButton *openButton;
     QPushButton *saveButton;
 

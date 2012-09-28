@@ -4,8 +4,6 @@
 #include <QPolygonF>
 #include <QPen>
 
-// TODO: implement getters and setters for selected
-// select(), deselect(), isSelected()
 class Curve : public QPolygonF
 {
 public:

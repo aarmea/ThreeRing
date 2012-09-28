@@ -3,12 +3,6 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    /*
-    openAction = new QAction(tr("&Open"), this);
-    saveAction = new QAction(tr("&Save"), this);
-    exitAction = new QAction(tr("E&xit"), this);
-    */
-
     mainWidget = new QWidget;
     mainLayout = new QVBoxLayout;
     ribbon = new Ribbon(this);
@@ -18,18 +12,6 @@ MainWindow::MainWindow(QWidget *parent) :
     mainLayout->addWidget(noteEdit);
     mainWidget->setLayout(mainLayout);
     setCentralWidget(mainWidget);
-
-    /*
-    connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
-    connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
-    connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
-
-    fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->addAction(openAction);
-    fileMenu->addAction(saveAction);
-    fileMenu->addSeparator();
-    fileMenu->addAction(exitAction);
-    */
 
     setWindowTitle(tr("ThreeRing"));
     resize(800, 600);
@@ -46,8 +28,10 @@ void MainWindow::open()
 {
     QString path = QFileDialog::getOpenFileName(
                 this, tr("Open"), QDir::homePath(), tr("SVG files (*.svg)"));
-    noteEdit->clear();
-    svgOpen(path, noteEdit);
+    if (!path.isEmpty()) {
+        noteEdit->clear();
+        svgOpen(path, noteEdit);
+    }
 }
 
 // Save the current document.

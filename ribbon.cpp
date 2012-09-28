@@ -8,7 +8,7 @@ Ribbon::Ribbon(QWidget *parent) :
     // TODO: fix size/margins
     tabs = new QTabWidget(this);
 
-    initFileTab();
+    initHomeTab();
     initDrawTab();
 
     tabs->show();
@@ -19,22 +19,22 @@ QSize Ribbon::sizeHint() const
     return QSize(RibbonWidth, RibbonHeight);
 }
 
-void Ribbon::initFileTab()
+void Ribbon::initHomeTab()
 {
-    fileTab = new QWidget;
-    fileTabLayout = new QHBoxLayout;
+    homeTab = new QWidget;
+    homeTabLayout = new QHBoxLayout;
 
     openButton = new QPushButton(tr("&Open"));
     saveButton = new QPushButton(tr("&Save"));
 
-    fileTabLayout->addWidget(openButton);
-    fileTabLayout->addWidget(saveButton);
+    homeTabLayout->addWidget(openButton);
+    homeTabLayout->addWidget(saveButton);
 
     connect(openButton, SIGNAL(clicked()), parent(), SLOT(open()));
     connect(saveButton, SIGNAL(clicked()), parent(), SLOT(save()));
 
-    fileTab->setLayout(fileTabLayout);
-    fileTabId = tabs->addTab(fileTab, tr("&File"));
+    homeTab->setLayout(homeTabLayout);
+    homeTabId = tabs->addTab(homeTab, tr("&Home"));
 }
 
 void Ribbon::initDrawTab()
