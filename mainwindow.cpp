@@ -3,21 +3,23 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
+    /*
     openAction = new QAction(tr("&Open"), this);
     saveAction = new QAction(tr("&Save"), this);
     exitAction = new QAction(tr("E&xit"), this);
+    */
 
     mainWidget = new QWidget;
     mainLayout = new QVBoxLayout;
     ribbon = new Ribbon(this);
     noteEdit = new NoteEditor;
 
-    // TODO: add a ribbon-like interface
     mainLayout->addWidget(ribbon);
     mainLayout->addWidget(noteEdit);
     mainWidget->setLayout(mainLayout);
     setCentralWidget(mainWidget);
 
+    /*
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
     connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
@@ -27,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     fileMenu->addAction(saveAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
+    */
 
     setWindowTitle(tr("ThreeRing"));
     resize(800, 600);
