@@ -18,7 +18,7 @@ Ribbon::Ribbon(QWidget *parent) :
 
 QSize Ribbon::sizeHint() const
 {
-    return QSize(RibbonWidth, RibbonHeight);
+    return QSize(width(), tabs->height());
 }
 
 void Ribbon::initHomeTab()

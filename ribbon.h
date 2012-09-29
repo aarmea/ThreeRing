@@ -12,8 +12,6 @@ class Ribbon : public QWidget
 public:
     explicit Ribbon(QWidget *parent = 0);
 
-    // TODO: determine the optimal width
-    enum {RibbonWidth = 400, RibbonHeight = 96};
     QSize sizeHint() const;
     
 signals:
