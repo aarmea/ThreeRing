@@ -7,6 +7,8 @@ Ribbon::Ribbon(QWidget *parent) :
 
     // TODO: fix size/margins
     tabs = new QTabWidget(this);
+    // TODO: somehow set tabs->sizeHint
+    tabs->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     initHomeTab();
     initDrawTab();
@@ -22,7 +24,7 @@ QSize Ribbon::sizeHint() const
 void Ribbon::initHomeTab()
 {
     homeTab = new QWidget;
-    homeTabLayout = new QHBoxLayout;
+    homeTabLayout = new QVBoxLayout;
 
     openButton = new QPushButton(tr("&Open"));
     saveButton = new QPushButton(tr("&Save"));

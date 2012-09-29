@@ -13,7 +13,7 @@ public:
     explicit Ribbon(QWidget *parent = 0);
 
     // TODO: determine the optimal width
-    enum {RibbonWidth = 400, RibbonHeight = 84};
+    enum {RibbonWidth = 400, RibbonHeight = 96};
     QSize sizeHint() const;
     
 signals:
@@ -25,7 +25,7 @@ private:
 
     void initHomeTab();
     QWidget *homeTab;
-    QHBoxLayout *homeTabLayout;
+    QVBoxLayout *homeTabLayout;
     int homeTabId;
     QPushButton *openButton;
     QPushButton *saveButton;
