@@ -104,6 +104,7 @@ QCursor NoteEditor::cursorFromPen(const QPen &pen)
 void NoteEditor::tabletEvent(QTabletEvent *event)
 {
     ulCorner = mapToGlobal(QPoint(0,0));
+    grabKeyboard();
 
     // Check the surrounding points for selected Curves
     selection_type surPoints;
@@ -148,7 +149,6 @@ void NoteEditor::tabletEvent(QTabletEvent *event)
 void NoteEditor::tabletPressEvent(QTabletEvent *event)
 {
     tabletDown = true;
-    grabKeyboard();
     if (getPenMode() != PenMove) {
         clearSelection();
     }
