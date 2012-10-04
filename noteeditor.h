@@ -65,6 +65,7 @@ private:
     Curve selectionBound;
     bool selectionActive;
     selection_type selection;
+    selection_type selectionGreedy;
     void updateSelection();
     void moveSelection(QPointF distance);
     void clearSelection();

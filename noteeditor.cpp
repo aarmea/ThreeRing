@@ -378,15 +378,20 @@ void NoteEditor::removeBackpointers(drawing_type::iterator curve)
             backpointers.set(point.x(), point.y(), curves);
         }
     }
-
 }
 
 // Maintain the selection.
 void NoteEditor::updateSelection() {
-    // TODO: speed up by only checking the new area at each point
+    // selectionBound must be at least a triangle
+    if (selectionBound.size() < 3) return;
 
     // Populate selection
-    QRegion region(selectionBound.toPolygon());
+    // QRegion region(selectionBound.toPolygon());
+    QPolygon regionPolygon(3);
+    regionPolygon[0] = selectionBound[0].toPoint();
+    regionPolygon[1] = selectionBound[selectionBound.size()-2].toPoint();
+    regionPolygon[2] = selectionBound[selectionBound.size()-1].toPoint();
+    QRegion region(regionPolygon);
     QVector<QRect> regionRects = region.rects();
     for (QVector<QRect>::size_type i = 0; i < regionRects.size(); ++i) {
         QRect &rect = regionRects[i];
@@ -397,9 +402,10 @@ void NoteEditor::updateSelection() {
                 selection_type::iterator itr;
                 for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
                     drawing_type::iterator curvePtr = itr.key();
+                    // TODO: use a separate selectionGreedy in the class
                     if (curvePtr.i) {
-                        selection.insert(curvePtr, 1);
-                        curvePtr->select();
+                        selectionGreedy.insert(curvePtr, 1);
+                        // curvePtr->select();
                     }
                 }
             }
@@ -407,6 +413,7 @@ void NoteEditor::updateSelection() {
     }
 
     // Remove curves at edge from selection
+    selection_type selectionExcludes;
     for (Curve::size_type i = 0; i <= selectionBound.size(); ++i) {
         // yes, "<=" in conditional to check the implicit closing edge
         Curve::raster_type edge = selectionBound.getRasterPoints(i);
@@ -419,12 +426,27 @@ void NoteEditor::updateSelection() {
                     selection_type::iterator itr;
                     for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
                         drawing_type::iterator curvePtr = itr.key();
-                        if (selection.remove(curvePtr)) {
-                            curvePtr->deselect();
+                        // TODO: use a separate selectionExcludes in the class
+                        if (curvePtr.i) {
+                            selectionExcludes.insert(curvePtr, 1);
                         }
+                        /* if (selection.remove(curvePtr)) {
+                            curvePtr->deselect();
+                        } */
                     }
                 }
             }
+        }
+    }
+
+    // TODO: selection = selectionGreedy - selectionExcludes;
+    selection.clear();
+    selection_type::iterator itr;
+    for (itr = selectionGreedy.begin(); itr != selectionGreedy.end(); ++itr) {
+        drawing_type::iterator curvePtr = itr.key();
+        if (!selectionExcludes.contains(curvePtr)) {
+            selection.insert(curvePtr, 1);
+            curvePtr->select();
         }
     }
 
@@ -455,6 +477,7 @@ void NoteEditor::clearSelection()
         itr.key()->deselect();
     }
     selection.clear();
+    selectionGreedy.clear();
     selectionBound.clear();
     selectionActive = false;
 
