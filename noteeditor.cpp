@@ -385,8 +385,6 @@ void NoteEditor::removeBackpointers(drawing_type::iterator curve)
 void NoteEditor::updateSelection() {
     // TODO: speed up by only checking the new area at each point
 
-    selection_type newSelection;
-
     // Populate selection
     QRegion region(selectionBound.toPolygon());
     QVector<QRect> regionRects = region.rects();
@@ -400,7 +398,7 @@ void NoteEditor::updateSelection() {
                 for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
                     drawing_type::iterator curvePtr = itr.key();
                     if (curvePtr.i) {
-                        newSelection.insert(curvePtr, 1);
+                        selection.insert(curvePtr, 1);
                         curvePtr->select();
                     }
                 }
@@ -421,7 +419,7 @@ void NoteEditor::updateSelection() {
                     selection_type::iterator itr;
                     for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
                         drawing_type::iterator curvePtr = itr.key();
-                        if (newSelection.remove(curvePtr)) {
+                        if (selection.remove(curvePtr)) {
                             curvePtr->deselect();
                         }
                     }
@@ -429,8 +427,6 @@ void NoteEditor::updateSelection() {
             }
         }
     }
-
-    selection = newSelection;
 
     updateAround(selectionBound.boundingRect().toAlignedRect());
 }
