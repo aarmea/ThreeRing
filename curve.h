@@ -11,10 +11,6 @@ public:
     Curve(const Curve &otherCurve);
     Curve(QPen newPen);
 
-    void select();
-    void deselect();
-    bool isSelected();
-
     typedef QVector<QPoint> raster_type;
     raster_type getRasterPoints(size_type n);
     const QPen& getPen() const;
@@ -25,7 +21,6 @@ signals:
 public slots:
 
 private:
-    bool selected;
     QPen pen;
     
 };

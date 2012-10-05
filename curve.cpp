@@ -2,34 +2,20 @@
 
 // Default constructor.
 Curve::Curve() :
-    pen(QBrush(Qt::black), 1.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin),
-    selected(false)
+    pen(QBrush(Qt::black), 1.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)
 {
 }
 
 // Construct a curve with the given QPen
 Curve::Curve(QPen newPen) :
-    pen(newPen), selected(false)
+    pen(newPen)
 {
 }
 
 // Copy constructor.
 Curve::Curve(const Curve &otherCurve) :
-    pen(otherCurve.pen), selected(otherCurve.selected)
+    pen(otherCurve.pen)
 {
-}
-
-// Manage whether the curve is selected
-void Curve::select() {
-    selected = true;
-}
-
-void Curve::deselect() {
-    selected = false;
-}
-
-bool Curve::isSelected() {
-    return selected;
 }
 
 // Get the pixels occupied by the line between the (n-1)th and nth point

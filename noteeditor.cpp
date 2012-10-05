@@ -118,7 +118,7 @@ void NoteEditor::tabletEvent(QTabletEvent *event)
 
     // Change the penMode accordingly
     if (uniqueCurves.begin() != uniqueCurves.end() &&
-            (*uniqueCurves.begin())->isSelected()) {
+            selection.contains(*uniqueCurves.begin())) {
         setPenMode(PenMove);
     } else if (keyMods & Qt::ShiftModifier) {
         setPenMode(PenSelect);
@@ -236,7 +236,7 @@ void NoteEditor::paint(QPainter &painter, const QRect &clip)
         for (itr = drawing.begin(); itr != drawing.end(); ++itr) {
             Curve &curve = *itr;
             QPen pen = curve.getPen();
-            if (curve.isSelected()) {
+            if (selection.contains(itr)) {
                 QPen outerPen = pen;
                 outerPen.setWidthF(outerPen.widthF()+2);
                 painter.setPen(outerPen);
@@ -267,7 +267,7 @@ void NoteEditor::paint(QPainter &painter, const QRect &clip)
         for (itr = curves.begin(); itr != curves.end(); ++itr) {
             Curve &curve = *(itr.key());
             QPen pen = curve.getPen();
-            if (curve.isSelected()) {
+            if (selection.contains(itr.key())) {
                 QPen outerPen = pen;
                 outerPen.setWidthF(outerPen.widthF()+2);
                 painter.setPen(outerPen);
@@ -386,12 +386,12 @@ void NoteEditor::updateSelection() {
     if (selectionBound.size() < 3) return;
 
     // Populate selection
-    // QRegion region(selectionBound.toPolygon());
     QPolygon regionPolygon(3);
     regionPolygon[0] = selectionBound[0].toPoint();
     regionPolygon[1] = selectionBound[selectionBound.size()-2].toPoint();
     regionPolygon[2] = selectionBound[selectionBound.size()-1].toPoint();
     QRegion region(regionPolygon);
+    QRegion selectionRegion(selectionBound.toPolygon());
     QVector<QRect> regionRects = region.rects();
     for (QVector<QRect>::size_type i = 0; i < regionRects.size(); ++i) {
         QRect &rect = regionRects[i];
@@ -402,10 +402,10 @@ void NoteEditor::updateSelection() {
                 selection_type::iterator itr;
                 for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
                     drawing_type::iterator curvePtr = itr.key();
-                    // TODO: use a separate selectionGreedy in the class
-                    if (curvePtr.i) {
+                    if (selectionRegion.contains(newPoint)) {
                         selectionGreedy.insert(curvePtr, 1);
-                        // curvePtr->select();
+                    } else {
+                        selectionGreedy.remove(curvePtr);
                     }
                 }
             }
@@ -426,27 +426,21 @@ void NoteEditor::updateSelection() {
                     selection_type::iterator itr;
                     for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
                         drawing_type::iterator curvePtr = itr.key();
-                        // TODO: use a separate selectionExcludes in the class
-                        if (curvePtr.i) {
-                            selectionExcludes.insert(curvePtr, 1);
-                        }
-                        /* if (selection.remove(curvePtr)) {
-                            curvePtr->deselect();
-                        } */
+                        selectionExcludes.insert(curvePtr, 1);
                     }
                 }
             }
         }
     }
 
-    // TODO: selection = selectionGreedy - selectionExcludes;
+    // Set subtraction
     selection.clear();
     selection_type::iterator itr;
     for (itr = selectionGreedy.begin(); itr != selectionGreedy.end(); ++itr) {
         drawing_type::iterator curvePtr = itr.key();
+        Curve &curve = *curvePtr;
         if (!selectionExcludes.contains(curvePtr)) {
             selection.insert(curvePtr, 1);
-            curvePtr->select();
         }
     }
 
@@ -472,10 +466,6 @@ void NoteEditor::clearSelection()
 {
     QRect selectionRect = selectionBound.boundingRect().toAlignedRect();
 
-    for (selection_type::iterator itr = selection.begin();
-         itr != selection.end(); ++itr) {
-        itr.key()->deselect();
-    }
     selection.clear();
     selectionGreedy.clear();
     selectionBound.clear();
