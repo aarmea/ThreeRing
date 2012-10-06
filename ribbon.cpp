@@ -41,5 +41,9 @@ void Ribbon::initHomeTab()
 
 void Ribbon::initDrawTab()
 {
-    // TODO: implement!
+    drawTab = new QWidget;
+
+    // TODO: populate this tab!
+
+    drawTabId = tabs->addTab(drawTab, tr("&Draw"));
 }

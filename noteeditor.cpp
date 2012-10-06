@@ -451,6 +451,7 @@ void NoteEditor::updateSelection() {
 void NoteEditor::moveSelection(QPointF distance)
 {
     selection_type::iterator itr;
+    selectionBound.translate(distance);
     for (itr = selection.begin(); itr != selection.end(); ++itr) {
         removeBackpointers(itr.key());
         QRect oldRect = itr.key()->boundingRect().toAlignedRect();
