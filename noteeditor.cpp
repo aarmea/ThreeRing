@@ -52,6 +52,12 @@ void NoteEditor::keyReleaseEvent(QKeyEvent *event)
     keyMods = event->modifiers();
 }
 
+// Set the pen
+void NoteEditor::setPen(QPen newPen)
+{
+    currentPen = newPen;
+}
+
 // Setters and getters for penMode
 void NoteEditor::setPenMode(PenMode newPenMode)
 {

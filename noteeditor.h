@@ -44,6 +44,7 @@ public:
 signals:
     
 public slots:
+    void setPen(QPen newPen);
 
 private:
     typedef QMap<drawing_type::iterator, char> selection_type;

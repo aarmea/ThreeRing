@@ -5,8 +5,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     mainWidget = new QWidget;
     mainLayout = new QVBoxLayout;
-    ribbon = new Ribbon(this);
     noteEdit = new NoteEditor;
+    ribbon = new Ribbon(this, noteEdit);
 
     mainLayout->addWidget(ribbon);
     mainLayout->addWidget(noteEdit);
