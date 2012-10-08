@@ -91,19 +91,22 @@ NoteEditor::PenMode NoteEditor::getPenMode() const
 }
 
 // Create a cursor from the given pen.
-QCursor NoteEditor::cursorFromPen(const QPen &pen)
+QCursor NoteEditor::cursorFromPen(const QPen &pen, PenCursorMode mode)
 {
     // Create a QPixmap, draw a single point in it,
     // then create a QCursor from that QPixmap
     QPixmap pixmap(32, 32);
-    pixmap.fill(Qt::transparent);
+    if (mode == Standalone)
+        pixmap.fill(Qt::transparent);
+    else
+        pixmap.load(":/images/pencil.png");
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
-    QPen newPen = currentPen;
+    QPen newPen = pen;
     newPen.setWidthF(newPen.widthF()+0.5);
     painter.setPen(newPen);
-    painter.drawPoint(QPoint(16, 16));
-    return QCursor(pixmap);
+    painter.drawPoint(QPoint(8, 8));
+    return QCursor(pixmap, 8, 8);
 }
 
 // Handle tablet events.
@@ -161,6 +164,7 @@ void NoteEditor::tabletPressEvent(QTabletEvent *event)
 
     switch (getPenMode()) {
     case PenPen:
+        setCursor(cursorFromPen(currentPen, Standalone));
         currentCurve = getNewCurve();
         addPointToCurve(event->hiResGlobalPos()-ulCorner, currentCurve);
         break;
@@ -181,6 +185,8 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
     tabletDown = false;
     releaseKeyboard();
     switch (getPenMode()) {
+    case PenPen:
+        setCursor(cursorFromPen(currentPen, WithPencil));
     case PenSelect:
         updateAround(selectionBound.boundingRect().toAlignedRect());
         selectionActive = false;

@@ -27,7 +27,8 @@ public:
     enum MouseMode {MouseMouse, MousePen};
     void setPenMode(PenMode newPenMode);
     PenMode getPenMode() const;
-    QCursor cursorFromPen(const QPen &pen);
+    enum PenCursorMode {Standalone, WithPencil};
+    QCursor cursorFromPen(const QPen &pen, PenCursorMode mode = WithPencil);
 
     void tabletEvent(QTabletEvent *event);
 
