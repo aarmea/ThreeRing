@@ -49,56 +49,21 @@ void Ribbon::initDrawTab()
     penSection = new QGroupBox(tr("&Pens"));
     penSectionLayout = new QHBoxLayout;
     // TODO: generate default (and custom) pens from a settings file
-    blackPenSelect = new QPushButton(tr("Black"));
+    blackPenSelect = new PenSelectButton(Qt::black, 1.0);
     penSectionLayout->addWidget(blackPenSelect);
-    redPenSelect = new QPushButton(tr("Red"));
+    redPenSelect = new PenSelectButton(Qt::red, 1.0);
     penSectionLayout->addWidget(redPenSelect);
-    bluePenSelect = new QPushButton(tr("Blue"));
+    bluePenSelect = new PenSelectButton(Qt::blue, 1.0);
     penSectionLayout->addWidget(bluePenSelect);
-    greenPenSelect = new QPushButton(tr("Green"));
+    greenPenSelect = new PenSelectButton(Qt::green, 1.0);
     penSectionLayout->addWidget(greenPenSelect);
     penSection->setLayout(penSectionLayout);
     drawTabLayout->addWidget(penSection);
 
-    // TODO: fix these connect()s - "No such slot NoteEditor::setPen()"
-    /*
-    // Method 1: use a QSignalMapper to send multiple signals to the same slot
-    penSelectMapper = new QSignalMapper;
-    penSelectMapper->setMapping(blackPenSelect,
-                                QPen(QBrush(Qt::black), 1.0, Qt::SolidLine,
-                                     Qt::RoundCap, Qt::RoundJoin));
-    penSelectMapper->setMapping(redPenSelect,
-                                QPen(QBrush(Qt::red), 1.0, Qt::SolidLine,
-                                     Qt::RoundCap, Qt::RoundJoin));
-    penSelectMapper->setMapping(bluePenSelect,
-                                QPen(QBrush(Qt::blue), 1.0, Qt::SolidLine,
-                                     Qt::RoundCap, Qt::RoundJoin));
-    penSelectMapper->setMapping(greenPenSelect,
-                                QPen(QBrush(Qt::green), 1.0, Qt::SolidLine,
-                                     Qt::RoundCap, Qt::RoundJoin));
-    connect(blackPenSelect, SIGNAL(clicked()), penSelectMapper, SLOT(map()));
-    connect(redPenSelect, SIGNAL(clicked()), penSelectMapper, SLOT(map()));
-    connect(bluePenSelect, SIGNAL(clicked()), penSelectMapper, SLOT(map()));
-    connect(greenPenSelect, SIGNAL(clicked()), penSelectMapper, SLOT(map()));
-    connect(penSelectMapper, SIGNAL(mapped(QObject*))),
-            noteEdit, SLOT(setPen(QObject*));
-    */
-
-    /*
-    // Method 2: subclass the buttons to send the QPen in the signal
-    connect(blackPenSelect, SIGNAL(clicked()), noteEdit, SLOT(setPen(
-                QPen(QBrush(Qt::black), 1.0, Qt::SolidLine, Qt::RoundCap,
-                     Qt::RoundJoin))));
-    connect(redPenSelect, SIGNAL(clicked()), noteEdit, SLOT(setPen(
-                QPen(QBrush(Qt::red), 1.0, Qt::SolidLine, Qt::RoundCap,
-                     Qt::RoundJoin))));
-    connect(bluePenSelect, SIGNAL(clicked()), noteEdit, SLOT(setPen(
-                QPen(QBrush(Qt::blue), 1.0, Qt::SolidLine, Qt::RoundCap,
-                     Qt::RoundJoin))));
-    connect(greenPenSelect, SIGNAL(clicked()), noteEdit, SLOT(setPen(
-                QPen(QBrush(Qt::green), 1.0, Qt::SolidLine, Qt::RoundCap,
-                     Qt::RoundJoin))));
-    */
+    connect(blackPenSelect, SIGNAL(clicked(QPen)), noteEdit, SLOT(setPen(QPen)));
+    connect(redPenSelect, SIGNAL(clicked(QPen)), noteEdit, SLOT(setPen(QPen)));
+    connect(bluePenSelect, SIGNAL(clicked(QPen)), noteEdit, SLOT(setPen(QPen)));
+    connect(greenPenSelect, SIGNAL(clicked(QPen)), noteEdit, SLOT(setPen(QPen)));
 
     drawTab->setLayout(drawTabLayout);
     drawTabId = tabs->addTab(drawTab, tr("&Draw"));

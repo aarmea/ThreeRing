@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include "penselectbutton.h"
 #include "noteeditor.h"
 
 class Ribbon : public QWidget
@@ -42,10 +43,10 @@ private:
     QGroupBox *penSection;
     QHBoxLayout *penSectionLayout;
     QSignalMapper *penSelectMapper;
-    QPushButton *blackPenSelect;
-    QPushButton *redPenSelect;
-    QPushButton *bluePenSelect;
-    QPushButton *greenPenSelect;
+    PenSelectButton *blackPenSelect;
+    PenSelectButton *redPenSelect;
+    PenSelectButton *bluePenSelect;
+    PenSelectButton *greenPenSelect;
 };
 
 #endif // RIBBON_H
