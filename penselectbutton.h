@@ -1,10 +1,10 @@
 #ifndef PENSELECTBUTTON_H
 #define PENSELECTBUTTON_H
 
+#include <QToolButton>
 #include <QPen>
-#include <QPushButton>
 
-class PenSelectButton : public QPushButton
+class PenSelectButton : public QToolButton
 {
     Q_OBJECT
 public:
