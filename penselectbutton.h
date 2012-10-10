@@ -2,6 +2,8 @@
 #define PENSELECTBUTTON_H
 
 #include <QToolButton>
+#include <QPoint>
+#include <QPainter>
 #include <QPen>
 
 class PenSelectButton : public QToolButton
@@ -22,6 +24,11 @@ private slots:
     
 private:
     QPen pen_;
+    const static QSize iconSize;
+    const static int iconPointsSize;
+    const static QPointF iconPoints[];
+
+    void init();
 };
 
 #endif // PENSELECTBUTTON_H
