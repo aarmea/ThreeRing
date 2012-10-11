@@ -7,7 +7,8 @@ SOURCES += \
     noteeditor.cpp \
     svgfileio.cpp \
     ribbon.cpp \
-    penselectbutton.cpp
+    penselectbutton.cpp \
+    noteeditorcommand.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -16,7 +17,8 @@ HEADERS += \
     table.h \
     svgfileio.h \
     ribbon.h \
-    penselectbutton.h
+    penselectbutton.h \
+    noteeditorcommand.h
 
 RESOURCES += \
     images.qrc

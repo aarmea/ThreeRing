@@ -7,9 +7,11 @@
 #include <QLinkedList>
 #include <QMap>
 #include "table.h"
+#include <QStack>
 #include <QKeyEvent>
 #include <QTabletEvent>
 #include <QPainter>
+#include "noteeditorcommand.h"
 #include "curve.h"
 // TODO: make it work with a mouse, "mouseastablet.h"?
 
@@ -49,6 +51,9 @@ public slots:
 
 private:
     typedef QMap<drawing_type::iterator, char> selection_type;
+
+    friend class NoteEditorCommand;
+    QStack<NoteEditorCommand> history;
 
     bool tabletDown;
     Qt::KeyboardModifiers keyMods;
