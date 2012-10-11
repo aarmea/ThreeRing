@@ -78,3 +78,21 @@ void Curve::setPen(const QPen &newPen)
 {
     pen = newPen;
 }
+
+// Return the hash, creating one if necessary
+QByteArray Curve::getHash(HashUpdate update)
+{
+    if (update == Update || hash.isEmpty()) updateHash();
+    return hash;
+}
+
+// Update the hash
+void Curve::updateHash()
+{
+    QCryptographicHash hashFunction(QCryptographicHash::Md5);
+    for (int i = 0; i < size(); ++i) {
+        hashFunction.addData(QString::number(at(i).x()).toUtf8());
+        hashFunction.addData(QString::number(at(i).y()).toUtf8());
+    }
+    hash = hashFunction.result();
+}

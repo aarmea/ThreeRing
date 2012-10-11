@@ -3,6 +3,7 @@
 
 #include <QPolygonF>
 #include <QPen>
+#include <QCryptographicHash>
 
 class Curve : public QPolygonF
 {
@@ -15,6 +16,11 @@ public:
     raster_type getRasterPoints(size_type n);
     const QPen& getPen() const;
     void setPen(const QPen &newPen);
+
+    // TODO: implement a hash using QCryptographicHash
+    enum HashUpdate {Update, DontUpdate};
+    QByteArray getHash(HashUpdate update = DontUpdate);
+    void updateHash();
     
 signals:
     
@@ -22,7 +28,7 @@ public slots:
 
 private:
     QPen pen;
-    
+    QByteArray hash;
 };
 
 #endif // CURVE_H

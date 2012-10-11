@@ -4,6 +4,7 @@
 class NoteEditorCommand
 {
 public:
+    enum CommandType {AddCurves, RemoveCurves, MoveCurves};
     NoteEditorCommand();
 };
 
