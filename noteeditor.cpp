@@ -1,12 +1,5 @@
 #include "noteeditor.h"
 
-// Comparison for iterators for QMap in selection_type
-bool operator<(const NoteEditor::drawing_type::iterator &itr1,
-               const NoteEditor::drawing_type::iterator &itr2)
-{
-    return itr1.i < itr2.i;
-}
-
 // Default constructor.
 NoteEditor::NoteEditor(QWidget *parent) :
     QWidget(parent)
@@ -17,6 +10,7 @@ NoteEditor::NoteEditor(QWidget *parent) :
     penMode = PenPen;
     currentPen = QPen(QBrush(Qt::black), 1.0,
                       Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    currentCurve = NULL;
     mouseMode = MouseMouse;
     setFocusPolicy(Qt::StrongFocus); // for Mac keyboards
     // grabKeyboard();
@@ -123,7 +117,7 @@ void NoteEditor::tabletEvent(QTabletEvent *event)
             surPoints = surPoints.unite(getBackpointers(point));
         }
     }
-    QList<drawing_type::iterator> uniqueCurves = surPoints.uniqueKeys();
+    QList<Curve *> uniqueCurves = surPoints.uniqueKeys();
 
     // Change the penMode accordingly
     if (uniqueCurves.begin() != uniqueCurves.end() &&
@@ -165,7 +159,7 @@ void NoteEditor::tabletPressEvent(QTabletEvent *event)
     switch (getPenMode()) {
     case PenPen:
         setCursor(cursorFromPen(currentPen, Standalone));
-        currentCurve = getNewCurve();
+        currentCurve = new Curve(currentPen);
         addPointToCurve(event->hiResGlobalPos()-ulCorner, currentCurve);
         break;
     case PenErase:
@@ -173,7 +167,7 @@ void NoteEditor::tabletPressEvent(QTabletEvent *event)
         break;
     case PenSelect:
         selectionActive = true;
-        selectionBound.append(event->pos());
+        selectionBound.append(event->hiResGlobalPos()-ulCorner);
         break;
     default:
         break;
@@ -187,6 +181,8 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
     switch (getPenMode()) {
     case PenPen:
         setCursor(cursorFromPen(currentPen, WithPencil));
+        drawing[currentCurve->getHash()] = currentCurve;
+        currentCurve = NULL;
     case PenSelect:
         updateAround(selectionBound.boundingRect().toAlignedRect());
         selectionActive = false;
@@ -246,17 +242,22 @@ void NoteEditor::paint(QPainter &painter, const QRect &clip)
         // Redraw the whole thing
         drawing_type::iterator itr;
         for (itr = drawing.begin(); itr != drawing.end(); ++itr) {
-            Curve &curve = *itr;
-            QPen pen = curve.getPen();
-            if (selection.contains(itr)) {
+            Curve *curve = *itr;
+            QPen pen = curve->getPen();
+            if (selection.contains(curve)) {
                 QPen outerPen = pen;
                 outerPen.setWidthF(outerPen.widthF()+2);
                 painter.setPen(outerPen);
-                painter.drawPolyline(curve);
+                painter.drawPolyline(*curve);
                 pen.setColor(Qt::white);
             }
             painter.setPen(pen);
-            painter.drawPolyline(curve);
+            painter.drawPolyline(*curve);
+        }
+        // Separately redraw the current Curve
+        if (currentCurve) {
+            painter.setPen(currentCurve->getPen());
+            painter.drawPolyline(*currentCurve);
         }
     } else {
         // Find and redraw only the curves in the clip region
@@ -269,8 +270,8 @@ void NoteEditor::paint(QPainter &painter, const QRect &clip)
                         backpointers.get(clip.x()+i, clip.y()+j);
                 selection_type::iterator itr;
                 for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
-                    drawing_type::iterator curvePtr = itr.key();
-                    if (curvePtr.i)
+                    Curve *curvePtr = itr.key();
+                    if (curvePtr)
                         curves[curvePtr] = 1;
                 }
             }
@@ -306,18 +307,8 @@ void NoteEditor::updateAround(QRect updateRect, int dist)
     update(updateRect);
 }
 
-// Add a new curve to the drawing and get an iterator to it.
-NoteEditor::drawing_type::iterator NoteEditor::getNewCurve()
-{
-    drawing.push_back(Curve(currentPen));
-    drawing_type::iterator newCurve = drawing.end();
-    --newCurve;
-    return newCurve;
-}
-
 // Add a point to the given curve.
-void NoteEditor::addPointToCurve(
-        QPointF point, drawing_type::iterator curve)
+void NoteEditor::addPointToCurve(QPointF point, Curve *curve)
 {
     curve->append(point);
     Curve::raster_type rasterPoints =
@@ -328,7 +319,7 @@ void NoteEditor::addPointToCurve(
 }
 
 // Add a backpointer to the given curve at the given point.
-void NoteEditor::addBackpointer(QPoint point, drawing_type::iterator curve)
+void NoteEditor::addBackpointer(QPoint point, Curve *curve)
 {
     if (point.x() < 0 || point.y() < 0) return;
     table_size_type x = point.x();
@@ -346,7 +337,7 @@ void NoteEditor::addBackpointer(QPoint point, drawing_type::iterator curve)
 }
 
 // Add all of the backpointers to a given curve.
-void NoteEditor::addBackpointers(drawing_type::iterator curve)
+void NoteEditor::addBackpointers(Curve *curve)
 {
     Curve::size_type numPoints = curve->size();
     for (Curve::size_type i = 0; i < numPoints; ++i) {
@@ -374,7 +365,7 @@ NoteEditor::selection_type NoteEditor::getBackpointers(
 }
 
 // Remove the backpointers associated with the given curve.
-void NoteEditor::removeBackpointers(drawing_type::iterator curve)
+void NoteEditor::removeBackpointers(Curve *curve)
 {
     Curve::size_type numPoints = curve->size();
     for (Curve::size_type i = 0; i < numPoints; ++i) {
@@ -413,7 +404,7 @@ void NoteEditor::updateSelection() {
                 selection_type curvePtrs = getBackpointers(newPoint);
                 selection_type::iterator itr;
                 for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
-                    drawing_type::iterator curvePtr = itr.key();
+                    Curve *curvePtr = &(*itr.key());
                     if (selectionRegion.contains(newPoint)) {
                         selectionGreedy.insert(curvePtr, 1);
                     } else {
@@ -437,7 +428,7 @@ void NoteEditor::updateSelection() {
                     selection_type curvePtrs = getBackpointers(newPoint);
                     selection_type::iterator itr;
                     for (itr = curvePtrs.begin(); itr != curvePtrs.end(); ++itr) {
-                        drawing_type::iterator curvePtr = itr.key();
+                        Curve *curvePtr = &(*itr.key());
                         selectionExcludes.insert(curvePtr, 1);
                     }
                 }
@@ -449,8 +440,7 @@ void NoteEditor::updateSelection() {
     selection.clear();
     selection_type::iterator itr;
     for (itr = selectionGreedy.begin(); itr != selectionGreedy.end(); ++itr) {
-        drawing_type::iterator curvePtr = itr.key();
-        Curve &curve = *curvePtr;
+        Curve *curvePtr = &(*itr.key());
         if (!selectionExcludes.contains(curvePtr)) {
             selection.insert(curvePtr, 1);
         }
@@ -465,12 +455,16 @@ void NoteEditor::moveSelection(QPointF distance)
     selection_type::iterator itr;
     selectionBound.translate(distance);
     for (itr = selection.begin(); itr != selection.end(); ++itr) {
-        removeBackpointers(itr.key());
-        QRect oldRect = itr.key()->boundingRect().toAlignedRect();
-        itr.key()->translate(distance);
-        addBackpointers(itr.key());
+        Curve *curve = itr.key();
+        removeBackpointers(curve);
+        QRect oldRect = curve->boundingRect().toAlignedRect();
+        drawing.remove(curve->getHash());
+        curve->translate(distance);
+        curve->updateHash();
+        drawing[curve->getHash()] = curve;
+        addBackpointers(curve);
         updateAround(oldRect);
-        updateAround(itr.key()->boundingRect().toAlignedRect());
+        updateAround(curve->boundingRect().toAlignedRect());
     }
 }
 
@@ -507,12 +501,14 @@ void NoteEditor::eraseCurve(QPoint point)
 }
 
 // Erase the curve specified by the iterator.
-void NoteEditor::eraseCurve(drawing_type::iterator curve)
+void NoteEditor::eraseCurve(Curve *curve)
 {
     removeBackpointers(curve);
 
     QRect rect = curve->boundingRect().toAlignedRect();
-    drawing.erase(curve);
+    drawing.remove(curve->getHash());
     qDebug() << "eraseCurve() --> " << rect;
     updateAround(rect);
+
+    delete curve;
 }

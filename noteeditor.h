@@ -4,7 +4,6 @@
 #include <QDebug>
 
 #include <QWidget>
-#include <QLinkedList>
 #include <QMap>
 #include "table.h"
 #include <QStack>
@@ -39,10 +38,9 @@ public:
     void paint(QPainter &painter, const QRect &clip);
     void updateAround(QRect updateRect, int dist = 5);
 
-    typedef QLinkedList<Curve> drawing_type;
-    drawing_type::iterator getNewCurve();
-    void addPointToCurve(QPointF point, drawing_type::iterator curve);
-    void addBackpointer(QPoint point, drawing_type::iterator curve);
+    typedef QMap<Curve::hash_type, Curve *> drawing_type;
+    void addPointToCurve(QPointF point, Curve *curve);
+    void addBackpointer(QPoint point, Curve *curve);
     
 signals:
     
@@ -50,7 +48,7 @@ public slots:
     void setPen(QPen newPen);
 
 private:
-    typedef QMap<drawing_type::iterator, char> selection_type;
+    typedef QMap<Curve *, char> selection_type;
 
     friend class NoteEditorCommand;
     QStack<NoteEditorCommand> history;
@@ -61,7 +59,7 @@ private:
     MouseMode mouseMode;
 
     QPen currentPen;
-    drawing_type::iterator currentCurve;
+    Curve *currentCurve;
     drawing_type drawing;
     Table<selection_type> backpointers;
     QPainter painter;
@@ -81,14 +79,11 @@ private:
     void tabletReleaseEvent(QTabletEvent *event);
     void tabletMoveEvent(QTabletEvent *event);
 
-    void addBackpointers(drawing_type::iterator curve);
+    void addBackpointers(Curve *curve);
     selection_type getBackpointers(QPoint point) const;
-    void removeBackpointers(drawing_type::iterator curve);
+    void removeBackpointers(Curve *curve);
     void eraseCurve(QPoint point);
-    void eraseCurve(drawing_type::iterator curve);
+    void eraseCurve(Curve *curve);
 };
-
-bool operator<(const NoteEditor::drawing_type::iterator &itr1,
-               const NoteEditor::drawing_type::iterator &itr2);
 
 #endif // NOTEEDITOR_H
