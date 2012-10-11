@@ -35,6 +35,10 @@ private:
     QVBoxLayout *fileSectionLayout;
     QPushButton *openButton;
     QPushButton *saveButton;
+    QGroupBox *historySection;
+    QVBoxLayout *historySectionLayout;
+    QPushButton *undoButton;
+    QPushButton *redoButton;
 
     void initDrawTab();
     QWidget *drawTab;

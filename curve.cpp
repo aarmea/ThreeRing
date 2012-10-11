@@ -68,7 +68,7 @@ Curve::raster_type Curve::getRasterPoints(size_type n)
 }
 
 // Get the pen (style) of the curve.
-const QPen& Curve::getPen() const
+const QPen &Curve::getPen() const
 {
     return pen;
 }

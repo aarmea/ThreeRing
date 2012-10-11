@@ -37,6 +37,17 @@ void Ribbon::initHomeTab()
     connect(openButton, SIGNAL(clicked()), parent(), SLOT(open()));
     connect(saveButton, SIGNAL(clicked()), parent(), SLOT(save()));
 
+    historySection = new QGroupBox(tr("&History"));
+    historySectionLayout = new QVBoxLayout;
+    undoButton = new QPushButton(tr("&Undo"));
+    historySectionLayout->addWidget(undoButton);
+    redoButton = new QPushButton(tr("&Redo"));
+    historySectionLayout->addWidget(redoButton);
+    historySection->setLayout(historySectionLayout);
+    homeTabLayout->addWidget(historySection);
+
+    // TODO: implement and connect undo and redo
+
     homeTab->setLayout(homeTabLayout);
     homeTabId = tabs->addTab(homeTab, tr("&Home"));
 }
