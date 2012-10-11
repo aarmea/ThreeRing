@@ -80,7 +80,7 @@ void Curve::setPen(const QPen &newPen)
 }
 
 // Return the hash, creating one if necessary
-QByteArray Curve::getHash(HashUpdate update)
+Curve::hash_type Curve::getHash(HashUpdate update)
 {
     if (update == Update || hash.isEmpty()) updateHash();
     return hash;

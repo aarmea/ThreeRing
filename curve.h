@@ -17,9 +17,9 @@ public:
     const QPen& getPen() const;
     void setPen(const QPen &newPen);
 
-    // TODO: implement a hash using QCryptographicHash
+    typedef QByteArray hash_type;
     enum HashUpdate {Update, DontUpdate};
-    QByteArray getHash(HashUpdate update = DontUpdate);
+    hash_type getHash(HashUpdate update = DontUpdate);
     void updateHash();
     
 signals:
