@@ -40,8 +40,8 @@ public:
 
     typedef QMap<Curve::hash_type, Curve *> drawing_type;
     void addPointToCurve(QPointF point, Curve *curve);
-    void addBackpointer(QPoint point, Curve *curve);
-    
+    void addCurve(Curve *curve);
+
 signals:
     
 public slots:
@@ -79,6 +79,7 @@ private:
     void tabletReleaseEvent(QTabletEvent *event);
     void tabletMoveEvent(QTabletEvent *event);
 
+    void addBackpointer(QPoint point, Curve *curve);
     void addBackpointers(Curve *curve);
     selection_type getBackpointers(QPoint point) const;
     void removeBackpointers(Curve *curve);

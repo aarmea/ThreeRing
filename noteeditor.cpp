@@ -181,7 +181,7 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
     switch (getPenMode()) {
     case PenPen:
         setCursor(cursorFromPen(currentPen, WithPencil));
-        drawing[currentCurve->getHash()] = currentCurve;
+        addCurve(currentCurve);
         currentCurve = NULL;
     case PenSelect:
         updateAround(selectionBound.boundingRect().toAlignedRect());
@@ -316,6 +316,12 @@ void NoteEditor::addPointToCurve(QPointF point, Curve *curve)
     for (Curve::size_type i = 0; i < rasterPoints.size(); ++i) {
         addBackpointer(rasterPoints[i], curve);
     }
+}
+
+// Add a curve to the representation.
+void NoteEditor::addCurve(Curve *curve)
+{
+    drawing[curve->getHash()] = curve;
 }
 
 // Add a backpointer to the given curve at the given point.
@@ -461,7 +467,7 @@ void NoteEditor::moveSelection(QPointF distance)
         drawing.remove(curve->getHash());
         curve->translate(distance);
         curve->updateHash();
-        drawing[curve->getHash()] = curve;
+        addCurve(curve);
         addBackpointers(curve);
         updateAround(oldRect);
         updateAround(curve->boundingRect().toAlignedRect());

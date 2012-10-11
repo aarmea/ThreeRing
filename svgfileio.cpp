@@ -83,7 +83,7 @@ void svgParseGroup(const QDomElement &element, NoteEditor *editor, QPen pen)
                               curPointStr[1].toDouble());
                 editor->addPointToCurve(point, curve);
             }
-            // TODO: add the curve to the drawing map somehow
+            editor->addCurve(curve);
         }
         child = child.nextSiblingElement();
     }
