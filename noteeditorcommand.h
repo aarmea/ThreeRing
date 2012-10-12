@@ -15,7 +15,7 @@ public:
     enum CommandType {AddCurves, RemoveCurves, MoveCurves};
     NoteEditorCommand(NoteEditor *newNoteEditor = 0,
                       CommandType newType = AddCurves,
-                      QLinkedList<Curve> newCurves = QLinkedList<Curve>(),
+                      const QLinkedList<Curve> &newCurves = QLinkedList<Curve>(),
                       QPointF newDistance = QPointF());
     NoteEditorCommand(const NoteEditorCommand &other);
     NoteEditorCommand &operator=(const NoteEditorCommand &other);

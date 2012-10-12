@@ -2,11 +2,15 @@
 
 NoteEditorCommand::NoteEditorCommand(NoteEditor *newNoteEditor,
                                      NoteEditorCommand::CommandType newType,
-                                     QLinkedList<Curve> newCurves,
+                                     const QLinkedList<Curve> &newCurves,
                                      QPointF newDistance) :
     noteEdit(newNoteEditor), type(newType), curves(newCurves),
     distance(newDistance)
 {
+    if (!noteEdit) qDebug() << "WARN: Default NoteEditorCommand created";
+    qDebug() << "NoteEditorCommand: Constructor called";
+    qDebug() << "    with first curve hash" << curves.first().getHash();
+    qDebug() << "    and last curve hash  " << curves.last().getHash();
 }
 
 // Copy constructor.
@@ -14,11 +18,15 @@ NoteEditorCommand::NoteEditorCommand(const NoteEditorCommand &other) :
     noteEdit(other.noteEdit), type(other.type), curves(other.curves),
     distance(other.distance)
 {
+    qDebug() << "NoteEditorCommand: Copy constructor called";
+    qDebug() << "    with first curve hash" << curves.first().getHash();
+    qDebug() << "    and last curve hash  " << curves.last().getHash();
 }
 
 // Assignment.
 NoteEditorCommand &NoteEditorCommand::operator=(const NoteEditorCommand &other)
 {
+    qDebug() << "NoteEditorCommand: Assignment operator called";
     noteEdit = other.noteEdit;
     type = other.type;
     curves = other.curves;

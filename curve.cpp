@@ -14,7 +14,7 @@ Curve::Curve(QPen newPen) :
 
 // Copy constructor.
 Curve::Curve(const Curve &otherCurve) :
-    pen(otherCurve.pen)
+    QPolygonF(otherCurve), pen(otherCurve.pen)
 {
 }
 
