@@ -152,6 +152,7 @@ void NoteEditor::tabletEvent(QTabletEvent *event)
 void NoteEditor::tabletPressEvent(QTabletEvent *event)
 {
     tabletDown = true;
+    pressTabletPos = event->hiResGlobalPos()-ulCorner;
     if (getPenMode() != PenMove) {
         clearSelection();
     }
@@ -182,6 +183,10 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
     case PenPen:
         setCursor(cursorFromPen(currentPen, WithPencil));
         addCurve(currentCurve);
+        qDebug() << "Curve hash:" << currentCurve->getHash(Curve::Update);
+        qDebug() << "    with first point:" << currentCurve->first();
+        changedCurves.push_back(*currentCurve);
+        history.push(NoteEditorCommand(this, NoteEditorCommand::AddCurves, changedCurves));
         currentCurve = NULL;
     case PenSelect:
         updateAround(selectionBound.boundingRect().toAlignedRect());
@@ -190,6 +195,7 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
     default:
         break;
     }
+    changedCurves.clear();
 }
 
 void NoteEditor::tabletMoveEvent(QTabletEvent *event)
@@ -254,7 +260,7 @@ void NoteEditor::paint(QPainter &painter, const QRect &clip)
             painter.setPen(pen);
             painter.drawPolyline(*curve);
         }
-        // Separately redraw the current Curve
+        // Separately redraw the currentCurve
         if (currentCurve) {
             painter.setPen(currentCurve->getPen());
             painter.drawPolyline(*currentCurve);
@@ -291,6 +297,8 @@ void NoteEditor::paint(QPainter &painter, const QRect &clip)
             painter.drawPolyline(curve);
         }
     }
+    // The currentCurve has backpointers in the clip region,
+    // so it is implicitly redrawn
 
     // Draw the selection bound
     if (selectionActive) {
@@ -506,6 +514,13 @@ void NoteEditor::eraseCurve(QPoint point)
     }
 }
 
+// Erase the curve specified by the curveHash.
+void NoteEditor::eraseCurve(Curve::hash_type curveHash)
+{
+    Curve *curve = drawing.value(curveHash);
+    if (curve) eraseCurve(curve);
+}
+
 // Erase the curve specified by the iterator.
 void NoteEditor::eraseCurve(Curve *curve)
 {
@@ -517,4 +532,20 @@ void NoteEditor::eraseCurve(Curve *curve)
     updateAround(rect);
 
     delete curve;
+}
+
+// Manage the history.
+void NoteEditor::undo()
+{
+    if (history.isEmpty()) return;
+
+    history.top().unexecute();
+    history.pop();
+}
+
+void NoteEditor::redo()
+{
+    if (history.isEmpty()) return;
+
+    // TODO: implement!
 }

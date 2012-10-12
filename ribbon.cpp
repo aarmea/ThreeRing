@@ -47,6 +47,7 @@ void Ribbon::initHomeTab()
     homeTabLayout->addWidget(historySection);
 
     // TODO: implement and connect undo and redo
+    connect(undoButton, SIGNAL(clicked()), noteEdit, SLOT(undo()));
 
     homeTab->setLayout(homeTabLayout);
     homeTabId = tabs->addTab(homeTab, tr("&Home"));

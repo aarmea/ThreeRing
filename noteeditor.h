@@ -4,15 +4,18 @@
 #include <QDebug>
 
 #include <QWidget>
+#include <QLinkedList>
+#include <QStack>
 #include <QMap>
 #include "table.h"
-#include <QStack>
 #include <QKeyEvent>
 #include <QTabletEvent>
 #include <QPainter>
 #include "noteeditorcommand.h"
 #include "curve.h"
 // TODO: make it work with a mouse, "mouseastablet.h"?
+
+class NoteEditorCommand;
 
 class NoteEditor : public QWidget
 {
@@ -47,11 +50,15 @@ signals:
 public slots:
     void setPen(QPen newPen);
 
+    void undo();
+    void redo();
+
 private:
     typedef QMap<Curve *, char> selection_type;
 
     friend class NoteEditorCommand;
     QStack<NoteEditorCommand> history;
+    QLinkedList<Curve> changedCurves;
 
     bool tabletDown;
     Qt::KeyboardModifiers keyMods;
@@ -64,6 +71,7 @@ private:
     Table<selection_type> backpointers;
     QPainter painter;
     QPoint ulCorner;
+    QPointF pressTabletPos;
     QPointF curTabletPos;
     QPointF lastTabletPos;
 
@@ -84,6 +92,7 @@ private:
     selection_type getBackpointers(QPoint point) const;
     void removeBackpointers(Curve *curve);
     void eraseCurve(QPoint point);
+    void eraseCurve(Curve::hash_type curveHash);
     void eraseCurve(Curve *curve);
 };
 
