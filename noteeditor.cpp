@@ -153,6 +153,7 @@ void NoteEditor::tabletPressEvent(QTabletEvent *event)
 {
     tabletDown = true;
     pressTabletPos = event->hiResGlobalPos()-ulCorner;
+    changedCurves.clear();
     if (getPenMode() != PenMove) {
         clearSelection();
     }
@@ -186,8 +187,16 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
         qDebug() << "Curve hash:" << currentCurve->getHash(Curve::Update);
         qDebug() << "    with first point:" << currentCurve->first();
         changedCurves.push_back(*currentCurve);
-        history.push(NoteEditorCommand(this, NoteEditorCommand::AddCurves, changedCurves));
+        history.push(NoteEditorCommand(this, NoteEditorCommand::AddCurves,
+                                       changedCurves));
         currentCurve = NULL;
+        break;
+    case PenErase:
+        if (changedCurves.size() > 0)
+            history.push(NoteEditorCommand(this,
+                                           NoteEditorCommand::RemoveCurves,
+                                           changedCurves));
+        break;
     case PenSelect:
         updateAround(selectionBound.boundingRect().toAlignedRect());
         selectionActive = false;
@@ -195,7 +204,6 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
     default:
         break;
     }
-    changedCurves.clear();
 }
 
 void NoteEditor::tabletMoveEvent(QTabletEvent *event)
@@ -508,6 +516,7 @@ void NoteEditor::eraseCurve(QPoint point)
                 continue;
             selection_type curves = backpointers.get(point.x()+x, point.y()+y);
             if (curves.begin() != curves.end()) {
+                changedCurves.push_back(*curves.begin().key());
                 eraseCurve(curves.begin().key());
             }
         }
@@ -539,8 +548,7 @@ void NoteEditor::undo()
 {
     if (history.isEmpty()) return;
 
-    history.top().unexecute();
-    history.pop();
+    history.pop().unexecute();
 }
 
 void NoteEditor::redo()

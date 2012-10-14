@@ -8,9 +8,8 @@ NoteEditorCommand::NoteEditorCommand(NoteEditor *newNoteEditor,
     distance(newDistance)
 {
     if (!noteEdit) qDebug() << "WARN: Default NoteEditorCommand created";
+    if (newCurves.size() == 0) qDebug() << "WARN: Empty NoteEditorCommand created";
     qDebug() << "NoteEditorCommand: Constructor called";
-    qDebug() << "    with first curve hash" << curves.first().getHash();
-    qDebug() << "    and last curve hash  " << curves.last().getHash();
 }
 
 // Copy constructor.
@@ -19,8 +18,6 @@ NoteEditorCommand::NoteEditorCommand(const NoteEditorCommand &other) :
     distance(other.distance)
 {
     qDebug() << "NoteEditorCommand: Copy constructor called";
-    qDebug() << "    with first curve hash" << curves.first().getHash();
-    qDebug() << "    and last curve hash  " << curves.last().getHash();
 }
 
 // Assignment.
@@ -53,8 +50,6 @@ void NoteEditorCommand::execute()
 
 void NoteEditorCommand::unexecute()
 {
-    if (curves.isEmpty())
-        qDebug() << "WARN: Attempted to unexecute an empty Command";
     switch (type) {
     case AddCurves:
         removeCurves();
@@ -72,16 +67,25 @@ void NoteEditorCommand::unexecute()
 
 void NoteEditorCommand::addCurves()
 {
-    // TODO: implement!
+    QLinkedList<Curve>::iterator itr;
+    for (itr = curves.begin(); itr != curves.end(); ++itr) {
+        qDebug() << "Add Curve with hash:" << itr->getHash();
+        qDebug() << "    with first point:" << itr->first();
+        Curve *newCurve = new Curve(*itr);
+        noteEdit->addCurve(newCurve);
+        noteEdit->addBackpointers(newCurve);
+        noteEdit->updateAround(newCurve->boundingRect().toAlignedRect());
+    }
 }
 
 void NoteEditorCommand::removeCurves()
 {
     QLinkedList<Curve>::iterator itr;
     for (itr = curves.begin(); itr != curves.end(); ++itr) {
-        qDebug() << "Remove Curve with hash: " << itr->getHash(Curve::Update);
-        qDebug() << "    with first point:" << itr->first();
+        qDebug() << "Remove Curve with hash:" << itr->getHash();
+        qDebug() << "    with first point: " << itr->first();
         noteEdit->eraseCurve(itr->getHash());
+        // Redrawing is implicitly handled by eraseCurve
     }
 }
 
