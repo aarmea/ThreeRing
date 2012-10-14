@@ -17,6 +17,9 @@
 
 class NoteEditorCommand;
 
+typedef QMap<Curve::hash_type, Curve *> drawing_type;
+typedef QMap<Curve *, char> selection_type;
+
 class NoteEditor : public QWidget
 {
     Q_OBJECT
@@ -41,7 +44,6 @@ public:
     void paint(QPainter &painter, const QRect &clip);
     void updateAround(QRect updateRect, int dist = 5);
 
-    typedef QMap<Curve::hash_type, Curve *> drawing_type;
     void addPointToCurve(QPointF point, Curve *curve);
     void addCurve(Curve *curve);
 
@@ -54,8 +56,6 @@ public slots:
     void redo();
 
 private:
-    typedef QMap<Curve *, char> selection_type;
-
     friend class NoteEditorCommand;
     QStack<NoteEditorCommand> history;
     QLinkedList<Curve> changedCurves;

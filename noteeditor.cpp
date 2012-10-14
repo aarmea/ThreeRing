@@ -178,6 +178,9 @@ void NoteEditor::tabletPressEvent(QTabletEvent *event)
 
 void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
 {
+    // Ensure that the tabletReleaseEvent has a corresponding tabletPressEvent
+    if (tabletDown == false) return;
+
     tabletDown = false;
     releaseKeyboard();
     switch (getPenMode()) {
@@ -376,7 +379,7 @@ void NoteEditor::addBackpointers(Curve *curve)
 }
 
 // Get all of the backpointers at a given point.
-NoteEditor::selection_type NoteEditor::getBackpointers(
+selection_type NoteEditor::getBackpointers(
         QPoint point) const
 {
     int x = point.x();
