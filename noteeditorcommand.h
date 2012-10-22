@@ -8,6 +8,7 @@
 #include "curve.h"
 
 class NoteEditor;
+typedef QMap<Curve *, char> selection_type;
 
 class NoteEditorCommand
 {
@@ -16,6 +17,9 @@ public:
     NoteEditorCommand(NoteEditor *newNoteEditor = 0,
                       CommandType newType = AddCurves,
                       const QLinkedList<Curve> &newCurves = QLinkedList<Curve>(),
+                      QPointF newDistance = QPointF());
+    NoteEditorCommand(NoteEditor *newNoteEditor, CommandType newType,
+                      const selection_type &newCurves,
                       QPointF newDistance = QPointF());
     NoteEditorCommand(const NoteEditorCommand &other);
     NoteEditorCommand &operator=(const NoteEditorCommand &other);

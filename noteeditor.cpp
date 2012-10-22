@@ -204,6 +204,9 @@ void NoteEditor::tabletReleaseEvent(QTabletEvent *event)
         updateAround(selectionBound.boundingRect().toAlignedRect());
         selectionActive = false;
         break;
+    case PenMove:
+        // TODO: implement undo for selection move
+        break;
     default:
         break;
     }

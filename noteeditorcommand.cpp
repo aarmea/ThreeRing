@@ -12,6 +12,19 @@ NoteEditorCommand::NoteEditorCommand(NoteEditor *newNoteEditor,
     qDebug() << "NoteEditorCommand: Constructor called";
 }
 
+NoteEditorCommand::NoteEditorCommand(NoteEditor *newNoteEditor,
+                                     CommandType newType,
+                                     const selection_type &newCurves,
+                                     QPointF newDistance) :
+    noteEdit(newNoteEditor), type(newType), distance(newDistance)
+{
+    qDebug() << "NoteEditorCommand: Constructor using QMap called";
+    selection_type::const_iterator itr;
+    for (itr = newCurves.begin(); itr != newCurves.end(); ++itr) {
+        curves.push_back(*itr.key());
+    }
+}
+
 // Copy constructor.
 NoteEditorCommand::NoteEditorCommand(const NoteEditorCommand &other) :
     noteEdit(other.noteEdit), type(other.type), curves(other.curves),
