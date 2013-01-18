@@ -1,2 +1,18 @@
 # Qt per-platform settings
 *.pro.user
+
+# Qt generated files
+Makefile
+moc_*.*
+qrc_*.*
+
+# Object files
+*.o
+
+# Compiled binaries
+*.app/*
+*.exe
+
+# Sublime Text sessions
+*.sublime-workspace
+
