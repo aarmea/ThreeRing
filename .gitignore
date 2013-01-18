@@ -3,6 +3,7 @@
 
 # Qt generated files
 Makefile
+Makefile.*
 moc_*.*
 qrc_*.*
 
@@ -12,6 +13,9 @@ qrc_*.*
 # Compiled binaries
 *.app/*
 *.exe
+*.pdb
+debug/*
+release/*
 
 # Sublime Text sessions
 *.sublime-workspace
