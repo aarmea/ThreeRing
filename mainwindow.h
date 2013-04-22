@@ -17,13 +17,13 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     void closeEvent(QCloseEvent *event);
-    
+
 signals:
-    
+
 public slots:
     void open();
     void save();
-    
+
 private:
     QWidget *mainWidget;
     QVBoxLayout *mainLayout;

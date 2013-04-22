@@ -18,11 +18,11 @@ public:
     explicit Ribbon(QWidget *parent = 0, NoteEditor *noteEdit_ = 0);
 
     QSize sizeHint() const;
-    
+
 signals:
-    
+
 public slots:
-    
+
 private:
     QTabWidget *tabs;
     NoteEditor *noteEdit;

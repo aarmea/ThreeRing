@@ -21,7 +21,7 @@ public slots:
 
 private slots:
     void reemitClicked();
-    
+
 private:
     QPen pen_;
     const static QSize iconSize;

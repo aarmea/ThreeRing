@@ -21,9 +21,9 @@ public:
     enum HashUpdate {Update, DontUpdate};
     hash_type getHash(HashUpdate update = DontUpdate);
     void updateHash();
-    
+
 signals:
-    
+
 public slots:
 
 private:

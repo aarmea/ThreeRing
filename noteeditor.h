@@ -48,7 +48,7 @@ public:
     void addCurve(Curve *curve);
 
 signals:
-    
+
 public slots:
     void setPen(QPen newPen);
 
