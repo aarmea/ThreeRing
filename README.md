@@ -54,10 +54,16 @@ dependencies and has been tested on Windows, Mac OS X, and Linux.
         qmake
         nmake
 
-2. On Mac/Linux, open a shell and do the following:
+3. On Linux, open a shell and do the following:
 
         cd [cloned-threering]
         qmake
+        make
+
+4. On Mac, open a shell and do the following:
+
+        cd [cloned-threering]
+        qmake -spec macx-g++
         make
 
 For release mode, replace `make` with `make release`. You may need to copy some
