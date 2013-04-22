@@ -8,10 +8,10 @@ NoteEditor::NoteEditor(QWidget *parent) :
     selectionActive = false;
     keyMods = Qt::NoModifier;
     penMode = PenPen;
+    mouseMode = MousePen;
     currentPen = QPen(QBrush(Qt::black), 1.0,
                       Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     currentCurve = NULL;
-    mouseMode = MouseMouse;
     setFocusPolicy(Qt::StrongFocus); // for Mac keyboards
     // grabKeyboard();
     backpointers.resize(width()*2, height()*2, selection_type());
@@ -101,6 +101,55 @@ QCursor NoteEditor::cursorFromPen(const QPen &pen, PenCursorMode mode)
     painter.setPen(newPen);
     painter.drawPoint(QPoint(8, 8));
     return QCursor(pixmap, 8, 8);
+}
+
+void NoteEditor::mouseMoveEvent(QMouseEvent *event)
+{
+    if (mouseMode == MousePen) {
+        tabletEventFromMouse(event);
+        event->accept();
+    }
+}
+
+void NoteEditor::mousePressEvent(QMouseEvent *event)
+{
+    if (mouseMode == MousePen) {
+        tabletEventFromMouse(event);
+        event->accept();
+    }
+}
+
+void NoteEditor::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (mouseMode == MousePen) {
+        tabletEventFromMouse(event);
+        event->accept();
+    }
+}
+
+// Convert a QMouseEvent into an equivalent QTabletEvent and emit it
+void NoteEditor::tabletEventFromMouse(QMouseEvent *event)
+{
+    QEvent::Type type = event->type();
+    switch (type) {
+    case QEvent::MouseButtonPress:
+        type = QEvent::TabletPress;
+        break;
+    case QEvent::MouseButtonRelease:
+        type = QEvent::TabletRelease;
+        break;
+    case QEvent::MouseMove:
+        type = QEvent::TabletMove;
+        break;
+    default:
+        break;
+    }
+    // Create a dummy QTabletEvent with the same position and button state
+    // as the mouse
+    QTabletEvent newEvent(type,
+        event->pos(), event->globalPos(), QPointF(event->globalPos()),
+        0, 0, 0.0, 0, 0, 0.0, 0.0, 0, 0, 0x0);
+    tabletEvent(&newEvent);
 }
 
 // Handle tablet events.

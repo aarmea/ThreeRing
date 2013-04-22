@@ -13,7 +13,6 @@
 #include <QPainter>
 #include "noteeditorcommand.h"
 #include "curve.h"
-// TODO: make it work with a mouse, "mouseastablet.h"?
 
 class NoteEditorCommand;
 
@@ -37,6 +36,10 @@ public:
     enum PenCursorMode {Standalone, WithPencil};
     QCursor cursorFromPen(const QPen &pen, PenCursorMode mode = WithPencil);
 
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void tabletEventFromMouse(QMouseEvent *event);
     void tabletEvent(QTabletEvent *event);
 
     void paintEvent(QPaintEvent *event);
