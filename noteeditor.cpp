@@ -144,6 +144,9 @@ void NoteEditor::tabletEventFromMouse(QMouseEvent *event)
     default:
         break;
     }
+    // Hack to allow returning to pen mode after select or erase
+    // TODO: fix cursor icons after pen mode change
+    setPenMode(PenPen);
     // Create a dummy QTabletEvent with the same position and button state
     // as the mouse
     QTabletEvent newEvent(type,
